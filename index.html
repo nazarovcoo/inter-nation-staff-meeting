@@ -568,37 +568,9 @@ function buildUI() {
   initAll();
 }
 
-// Listen for real-time changes from Firebase
-dataRef.on('value', snapshot => {
-  const data = snapshot.val() || {};
-  if (!isLoaded) {
-    // First load — build the whole UI with Firebase data
-    firebaseData = data;
-    buildUI();
-    isLoaded = true;
-  } else {
-    // Subsequent updates — apply changes to individual elements
-    Object.keys(data).forEach(key => {
-      if (firebaseData[key] !== data[key]) {
-        applyFirebaseUpdate(key, data[key]);
-      }
-    });
-    // Handle deleted keys
-    Object.keys(firebaseData).forEach(key => {
-      if (data[key] === undefined) {
-        delete firebaseData[key];
-      }
-    });
-  }
-});
-
-// If Firebase is slow, show UI with defaults after 2 seconds
-setTimeout(() => {
-  if (!isLoaded) {
-    buildUI();
-    isLoaded = true;
-  }
-}, 2000);
+// Build UI immediately with defaults — no waiting for Firebase
+buildUI();
+isLoaded = true;
 </script>
 </body>
 </html>

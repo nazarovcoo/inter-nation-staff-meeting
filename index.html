@@ -128,8 +128,8 @@
 <div class="tabs">
   <div class="tab active" onclick="showPage('overview',this)">Total Statistics</div>
   <div class="tab" onclick="showPage('students',this)">Students by Branches</div>
-  <div class="tab" onclick="showPage('registered',this)">Waiting List</div>
   <div class="tab" onclick="showPage('retention',this)">Lost List</div>
+  <div class="tab" onclick="showPage('registered',this)">Waiting List</div>
   <div class="tab" onclick="showPage('leads',this)">Leads</div>
 </div>
 
@@ -313,7 +313,7 @@ function val(key, def) {
   return (firebaseData[key] !== undefined && firebaseData[key] !== null && firebaseData[key] !== 'null') ? firebaseData[key] : String(def);
 }
 
-const pageIds = ['overview','students','registered','retention','leads'];
+const pageIds = ['overview','students','retention','registered','leads'];
 
 function showPage(id, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));

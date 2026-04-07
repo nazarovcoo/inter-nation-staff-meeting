@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Inter Nation — Analytics Dashboard</title>
 <style>
+  /* v2.0 — full table alignment fix */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f1117; color: #e8e8e8; min-height: 100vh; }
   .header { background: #161b27; border-bottom: 1px solid #2a2f45; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
@@ -15,9 +16,6 @@
   .save-status { font-size: 11px; padding: 4px 12px; border-radius: 20px; transition: all 0.3s; }
   .save-status.saved { background: #1a3520; color: #4caf80; border: 1px solid #2a5a40; }
   .save-status.saving { background: #2a2510; color: #ffa040; border: 1px solid #5a4a20; }
-  .save-status.offline { background: #2a1515; color: #ff8080; border: 1px solid #5a2525; }
-  .btn-reset { font-size: 11px; padding: 4px 12px; border-radius: 20px; background: #2a1515; color: #ff8080; border: 1px solid #5a2525; cursor: pointer; }
-  .btn-reset:hover { background: #3a1a1a; }
   .tabs { display: flex; gap: 4px; padding: 16px 32px 0; background: #161b27; border-bottom: 1px solid #2a2f45; overflow-x: auto; }
   .tab { padding: 10px 20px; border-radius: 8px 8px 0 0; border: 1px solid transparent; font-size: 13px; cursor: pointer; transition: all 0.15s; color: #8899aa; white-space: nowrap; background: transparent; }
   .tab:hover { color: #c0cfe0; background: #1e2535; }
@@ -26,27 +24,33 @@
   .page { display: none; }
   .page.active { display: block; }
   .edit-hint { font-size: 12px; color: #7eb3ff; margin-bottom: 16px; padding: 10px 14px; background: #1a2035; border-radius: 8px; border-left: 3px solid #4f8ef7; }
+
+  /* TABLE SYSTEM — единый контракт для всех таблиц */
   table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  th, td { white-space: nowrap; }
-  th { background: #1a2035; color: #8899cc; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; padding: 12px 16px; text-align: right; border-bottom: 1px solid #2a2f45; }
-  th:first-child { text-align: left; width: 22%; }
-  td { padding: 11px 16px; border-bottom: 1px solid #1e2535; color: #d0d8e8; vertical-align: middle; text-align: right; }
+  th { background: #1a2035; color: #8899cc; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; padding: 12px 16px; text-align: right; border-bottom: 2px solid #2a2f45; white-space: nowrap; }
+  th:first-child { text-align: left; }
+  td { padding: 11px 16px; border-bottom: 1px solid #1e2535; color: #d0d8e8; vertical-align: middle; text-align: right; white-space: nowrap; }
   td:first-child { text-align: left; }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: #161d2f; }
-  [contenteditable] { cursor: text; outline: none; border-radius: 4px; transition: background 0.15s; min-width: 20px; }
-  th[contenteditable], td [contenteditable] { display: inline; }
+
+  /* CONTENTEDITABLE — только на span внутри td, не на th */
+  [contenteditable] { cursor: text; outline: none; border-radius: 4px; transition: background 0.15s; }
   [contenteditable]:focus { background: #1e3050 !important; outline: 2px solid #4f8ef7; outline-offset: 1px; }
   [contenteditable]:hover:not(:focus) { background: #1a2540; }
+
+  /* BADGES */
   .badge-new { background: #1a3520; color: #4caf80; font-size: 11px; padding: 3px 8px; border-radius: 12px; border: 1px solid #2a5a40; font-weight: 600; }
   .badge-pos { color: #4caf80; font-weight: 600; }
-  .badge-neg { background: #3a1515; color: #ff5555; font-size: 12px; padding: 3px 8px; border-radius: 5px; font-weight: 700; display: inline-block; }
+  .badge-neg { background: #3a1515; color: #ff5555; font-size: 12px; padding: 3px 8px; border-radius: 5px; font-weight: 700; }
+
+  /* SPECIAL ROWS */
   .row-total td { background: #f0c020 !important; color: #1a1200 !important; font-weight: 700; font-size: 15px; }
   .row-tashkent td { background: #d4a800 !important; color: #1a1200 !important; font-weight: 700; }
   .row-total-green td:last-child { background: #2a6a30 !important; color: #a0ffb0 !important; }
   .row-tashkent-red td:last-child { background: #6a1515 !important; color: #ff9090 !important; }
-  .row-total [contenteditable]:hover, .row-tashkent [contenteditable]:hover { background: rgba(0,0,0,0.1); }
-  .row-total [contenteditable]:focus, .row-tashkent [contenteditable]:focus { background: rgba(0,0,0,0.15) !important; }
+
+  /* METRICS */
   .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 28px; }
   .metric { background: #161b27; border: 1px solid #2a2f45; border-radius: 10px; padding: 16px 18px; }
   .metric-label { font-size: 11px; color: #667799; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
@@ -56,11 +60,15 @@
   .metric-sub { font-size: 12px; color: #667799; margin-top: 4px; }
   .trend-up { color: #4caf80; }
   .trend-down { color: #ff6b6b; }
+
+  /* CARDS */
   .card { background: #161b27; border: 1px solid #2a2f45; border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
   .card-header { padding: 14px 18px; border-bottom: 1px solid #2a2f45; }
   .card-title { font-size: 14px; font-weight: 600; color: #ccd; }
   .card-body { overflow-x: auto; }
   .sep-row td { height: 6px; background: #0f1117 !important; padding: 0; }
+
+  /* NAV */
   .nav-arrows { position: fixed; bottom: 30px; left: 30px; display: flex; gap: 10px; z-index: 1000; }
   .nav-btn { width: 56px; height: 56px; border-radius: 50%; border: 2px solid #2a2f45; background: #161b27; color: #7eb3ff; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
   .nav-btn:hover { background: #1e2a45; border-color: #4f8ef7; color: #fff; transform: scale(1.1); }
@@ -93,21 +101,21 @@
     <div class="card">
       <div class="card-header"><span class="card-title" contenteditable="true" data-key="rg-card-title">Итого по регионам</span></div>
       <div class="card-body"><table><thead><tr>
-        <th contenteditable="true" data-key="rg-h1">Регион</th>
-        <th contenteditable="true" data-key="rg-h2">Mar 2025</th>
-        <th contenteditable="true" data-key="rg-h3">Mar 2026</th>
-        <th contenteditable="true" data-key="rg-h4">Изм. (рел.)</th>
-        <th contenteditable="true" data-key="rg-h5">Изм. (%)</th>
+        <th>Регион</th>
+        <th>Mar 2025</th>
+        <th>Mar 2026</th>
+        <th>Изм. (рел.)</th>
+        <th>Изм. (%)</th>
       </tr></thead><tbody id="region-tbody"></tbody></table></div>
     </div>
 
     <div class="card">
       <div class="card-header"><span class="card-title" contenteditable="true" data-key="ov-card-title">Топ роста / падения по филиалам</span></div>
       <div class="card-body"><table><thead><tr>
-        <th contenteditable="true" data-key="ov-h1">Филиал</th>
-        <th contenteditable="true" data-key="ov-h2">Изменение</th>
-        <th contenteditable="true" data-key="ov-h3">%</th>
-        <th contenteditable="true" data-key="ov-h4">Статус</th>
+        <th>Филиал</th>
+        <th>Изменение</th>
+        <th>%</th>
+        <th>Статус</th>
       </tr></thead><tbody id="overview-tbody"></tbody></table></div>
     </div>
   </div>
@@ -117,11 +125,11 @@
     <div class="card">
       <div class="card-header"><span class="card-title" contenteditable="true" data-key="st-card-title">Студенты по филиалам — Mar 2025 vs Mar 2026</span></div>
       <div class="card-body"><table><thead><tr>
-        <th contenteditable="true" data-key="st-h1">Филиал</th>
-        <th contenteditable="true" data-key="st-h2">Mar 2025</th>
-        <th contenteditable="true" data-key="st-h3">Mar 2026</th>
-        <th contenteditable="true" data-key="st-h4">Изм. (рел.)</th>
-        <th contenteditable="true" data-key="st-h5">Изм. (%)</th>
+        <th>Филиал</th>
+        <th>Mar 2025</th>
+        <th>Mar 2026</th>
+        <th>Изм. (рел.)</th>
+        <th>Изм. (%)</th>
       </tr></thead><tbody id="branch-tbody"></tbody></table></div>
     </div>
   </div>
@@ -131,33 +139,33 @@
     <div class="card">
       <div class="card-header"><span class="card-title" contenteditable="true" data-key="lv-card-title">Распределение по уровням — Samarkand Mar 2026</span></div>
       <div class="card-body"><table><thead><tr>
-        <th contenteditable="true" data-key="lv-h1">Уровень</th>
-        <th contenteditable="true" data-key="lv-h2">Mar 2025</th>
-        <th contenteditable="true" data-key="lv-h3">Mar 2025 %</th>
-        <th contenteditable="true" data-key="lv-h4">Mar 2026 %</th>
-        <th contenteditable="true" data-key="lv-h5">Mar 2026</th>
+        <th>Уровень</th>
+        <th>Mar 2025</th>
+        <th>Mar 2025 %</th>
+        <th>Mar 2026 %</th>
+        <th>Mar 2026</th>
       </tr></thead><tbody id="levels-tbody"></tbody></table></div>
     </div>
 
     <div class="card">
       <div class="card-header"><span class="card-title" contenteditable="true" data-key="ag-card-title">Распределение по возрасту — Samarkand Mar 2026</span></div>
       <div class="card-body"><table><thead><tr>
-        <th contenteditable="true" data-key="ag-h1">Возраст</th>
-        <th contenteditable="true" data-key="ag-h2">Mar 2025</th>
-        <th contenteditable="true" data-key="ag-h3">Mar 2025 %</th>
-        <th contenteditable="true" data-key="ag-h4">Mar 2026 %</th>
-        <th contenteditable="true" data-key="ag-h5">Mar 2026</th>
+        <th>Возраст</th>
+        <th>Mar 2025</th>
+        <th>Mar 2025 %</th>
+        <th>Mar 2026 %</th>
+        <th>Mar 2026</th>
       </tr></thead><tbody id="age-tbody"></tbody></table></div>
     </div>
 
     <div class="card">
       <div class="card-header"><span class="card-title" contenteditable="true" data-key="nw-card-title">Новые студенты по филиалам — Mar 2026 vs Mar 2025</span></div>
       <div class="card-body"><table><thead><tr>
-        <th contenteditable="true" data-key="nw-h1">Филиал</th>
-        <th contenteditable="true" data-key="nw-h2">Mar 2025</th>
-        <th contenteditable="true" data-key="nw-h3">Mar 2026</th>
-        <th contenteditable="true" data-key="nw-h4">Изм. (рел.)</th>
-        <th contenteditable="true" data-key="nw-h5">Изм. (%)</th>
+        <th>Филиал</th>
+        <th>Mar 2025</th>
+        <th>Mar 2026</th>
+        <th>Изм. (рел.)</th>
+        <th>Изм. (%)</th>
       </tr></thead><tbody id="new-tbody"></tbody></table></div>
     </div>
   </div>
@@ -167,14 +175,14 @@
     <div class="card">
       <div class="card-header"><span class="card-title" contenteditable="true" data-key="rt-card-title">Удержание: February → March (по уровням)</span></div>
       <div class="card-body"><table><thead><tr>
-        <th contenteditable="true" data-key="rt-h1">Уровень</th>
-        <th contenteditable="true" data-key="rt-h2">2025 Feb</th>
-        <th contenteditable="true" data-key="rt-h3">Ушли Mar 2025</th>
-        <th contenteditable="true" data-key="rt-h4">Loss % 2025</th>
-        <th contenteditable="true" data-key="rt-h5">2026 Feb</th>
-        <th contenteditable="true" data-key="rt-h6">Ушли Mar 2026</th>
-        <th contenteditable="true" data-key="rt-h7">Loss % 2026</th>
-        <th contenteditable="true" data-key="rt-h8">Тренд</th>
+        <th>Уровень</th>
+        <th>2025 Feb</th>
+        <th>Ушли Mar 2025</th>
+        <th>Loss % 2025</th>
+        <th>2026 Feb</th>
+        <th>Ушли Mar 2026</th>
+        <th>Loss % 2026</th>
+        <th>Тренд</th>
       </tr></thead><tbody id="retention-tbody"></tbody></table></div>
     </div>
   </div>

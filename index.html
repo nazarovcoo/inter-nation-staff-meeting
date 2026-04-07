@@ -450,7 +450,7 @@ function buildUI() {
   lvData.forEach(([p,n,v25,p25,p26,v26]) => {
     lvTb.innerHTML += `<tr><td>${e(p+'a',n)}</td><td>${e(p+'b',v25)}</td><td>${e(p+'c',p25)}</td><td>${e(p+'d',p26)}</td><td>${e(p+'e',v26)}</td></tr>`;
   });
-  lvTb.innerHTML += `<tr class="row-total"><td></td><td>${e('lvt1',1656)}</td><td></td><td></td><td>${e('lvt2',2531)}</td></tr>`;
+  lvTb.innerHTML += `<tr class="row-total"><td>TOTAL</td><td>${e('lvt1',1656)}</td><td></td><td></td><td>${e('lvt2',2531)}</td></tr>`;
 
   // AGE
   const agData = [
@@ -467,7 +467,7 @@ function buildUI() {
   agData.forEach(([p,n,v25,p25,p26,v26]) => {
     agTb.innerHTML += `<tr><td>${e(p+'a',n)}</td><td>${e(p+'b',v25)}</td><td>${e(p+'c',p25)}</td><td>${e(p+'d',p26)}</td><td>${e(p+'e',v26)}</td></tr>`;
   });
-  agTb.innerHTML += `<tr class="row-total"><td></td><td>${e('agt1',1656)}</td><td></td><td></td><td>${e('agt2',2531)}</td></tr>`;
+  agTb.innerHTML += `<tr class="row-total"><td>TOTAL</td><td>${e('agt1',1656)}</td><td></td><td></td><td>${e('agt2',2531)}</td></tr>`;
 
   // NEW STUDENTS
   const nwData = [

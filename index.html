@@ -404,31 +404,32 @@ function buildUI() {
 
   // NEW STUDENTS
   const nwData = [
-    ['nw0','Online',0,440,440,'NEW','new'],
-    ['nw1','Andijan',0,213,213,'NEW','new'],
-    ['nw2','Samarkand',370,292,-78,'-21.1%','neg'],
-    ['nw3','Maksim Gorkiy',260,186,-74,'-28.5%','neg'],
-    ['nw4','Minor',181,130,-51,'-28.2%','neg'],
-    ['nw5','Sergeli',167,123,-44,'-26.3%','neg'],
-    ['nw6','Xalqlar Dostligi',347,261,-86,'-24.8%','neg'],
-    ['nw7','Chilonzor',284,216,-68,'-23.9%','neg'],
-    ['nw8','C1',110,86,-24,'-21.8%','neg'],
-    ['nw9','Ganga',109,94,-15,'-13.8%','neg'],
-    ['nw10','Westminster',178,172,-6,'-3.4%','neg'],
-    ['nw11','Beruniy',211,207,-4,'-1.9%','neg'],
-    ['nw12','Oybek',308,304,-4,'-1.3%','neg'],
-    ['nw13','Yunusabad',0,197,197,'NEW','new'],
+    ['nw0','Online',0,434,434,'NEW','new'],
+    ['nw1','Andijan',0,207,207,'NEW','new'],
+    ['nw2','Yunusabad',0,208,208,'NEW','new'],
+    ['nw3','Chilonzor',181,229,48,'26,5%','pos'],
+    ['nw4','Samarkand',248,229,-19,'-7,7%','neg'],
+    ['nw5','Beruniy',141,207,66,'46,8%','pos'],
+    ['nw6','Xalqlar Dostligi',179,206,27,'15,1%','pos'],
+    ['nw7','Oybek',214,203,-11,'-5,1%','neg'],
+    ['nw8','Maksim Gorkiy',225,177,-48,'-21,3%','neg'],
+    ['nw9','Sergeli',104,120,16,'15,4%','pos'],
+    ['nw10','Westminster',103,100,-3,'-2,9%','neg'],
+    ['nw11','Minor',117,99,-18,'-15,4%','neg'],
+    ['nw12','Ganga',62,59,-3,'-4,8%','neg'],
+    ['nw13','C1',82,53,-29,'-35,4%','neg'],
   ];
   const nwTb = document.getElementById('new-tbody');
   nwTb.innerHTML = '';
   nwData.forEach(([p,n,v25,v26,chg,pct,type]) => {
     let pc;
     if (type === 'new') pc = `<td>${e(p+'d',chg)}</td><td><span class="badge-new">NEW</span></td>`;
-    else pc = `<td>${e(p+'d',chg)}</td><td><span class="badge-neg">${e(p+'e',pct)}</span></td>`;
+    else if (type === 'neg') pc = `<td>${e(p+'d',chg)}</td><td><span class="badge-neg">${e(p+'e',pct)}</span></td>`;
+    else pc = `<td>${e(p+'d',chg)}</td><td><span class="badge-pos">${e(p+'e',pct)}</span></td>`;
     nwTb.innerHTML += `<tr><td>${e(p+'a',n)}</td><td>${e(p+'b',v25)}</td><td>${e(p+'c',v26)}</td>${pc}</tr>`;
   });
-  nwTb.innerHTML += `<tr class="row-tashkent row-tashkent-red"><td>TASHKENT</td><td>${e('nwt1',2155)}</td><td>${e('nwt2',1976)}</td><td>${e('nwt3',-179)}</td><td>${e('nwt4','-8,31%')}</td></tr>`;
-  nwTb.innerHTML += `<tr class="row-total row-total-green"><td>TOTAL</td><td>${e('nwtot1',2525)}</td><td>${e('nwtot2',2921)}</td><td>${e('nwtot3',396)}</td><td>${e('nwtot4','15,68%')}</td></tr>`;
+  nwTb.innerHTML += `<tr class="row-tashkent row-tashkent-red"><td>TASHKENT</td><td>${e('nwt1',1408)}</td><td>${e('nwt2',1453)}</td><td>${e('nwt3',45)}</td><td>${e('nwt4','3,20%')}</td></tr>`;
+  nwTb.innerHTML += `<tr class="row-total row-total-green"><td>TOTAL</td><td>${e('nwtot1',1656)}</td><td>${e('nwtot2',2531)}</td><td>${e('nwtot3',875)}</td><td>${e('nwtot4','52,84%')}</td></tr>`;
 
   // RETENTION — Feb → Mar
   const rtData = [

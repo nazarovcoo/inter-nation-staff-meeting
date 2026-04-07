@@ -92,6 +92,17 @@
     <div class="edit-hint">✏️ <strong>Кликни на любой текст или цифры</strong> — всё редактируется. Изменения сохраняются онлайн и видны всем!</div>
     <div class="metrics" id="metrics-grid"></div>
     <div class="card">
+      <div class="card-header"><span class="card-title" contenteditable="true" data-key="rg-card-title">Итого по регионам</span></div>
+      <div class="card-body"><table><thead><tr>
+        <th contenteditable="true" data-key="rg-h1">Регион</th>
+        <th contenteditable="true" data-key="rg-h2">Mar 2025</th>
+        <th contenteditable="true" data-key="rg-h3">Mar 2026</th>
+        <th contenteditable="true" data-key="rg-h4">Изм. (рел.)</th>
+        <th contenteditable="true" data-key="rg-h5">Изм. (%)</th>
+      </tr></thead><tbody id="region-tbody"></tbody></table></div>
+    </div>
+
+    <div class="card">
       <div class="card-header"><span class="card-title" contenteditable="true" data-key="ov-card-title">Топ роста / падения по филиалам</span></div>
       <div class="card-body"><table><thead><tr>
         <th contenteditable="true" data-key="ov-h1">Филиал</th>
@@ -290,6 +301,24 @@ function buildUI() {
       <div class="metric-sub" contenteditable="true" data-key="${ks}">${val(ks,sub)}</div>
     </div>`;
   });
+
+  // REGION TABLE
+  const rgData = [
+    ['rg0','Ташкент',17495,17123,-372,'-2,13%','neg'],
+    ['rg1','Самарканд',1213,2063,850,'70,07%','pos'],
+    ['rg2','Андижан',0,1196,1196,'NEW','new'],
+    ['rg3','Онлайн',0,1164,1164,'NEW','new'],
+  ];
+  const rgTb = document.getElementById('region-tbody');
+  rgTb.innerHTML = '';
+  rgData.forEach(([p,n,v25,v26,chg,pct,type]) => {
+    let pc;
+    if (type === 'new') pc = `<td>${e(p+'d',chg)}</td><td><span class="badge-new">NEW</span></td>`;
+    else if (type === 'neg') pc = `<td>${e(p+'d',chg)}</td><td><span class="badge-neg">${e(p+'e',pct)}</span></td>`;
+    else pc = `<td>${e(p+'d',chg)}</td><td><span class="badge-pos">${e(p+'e',pct)}</span></td>`;
+    rgTb.innerHTML += `<tr><td>${e(p+'a',n)}</td><td>${e(p+'b',v25)}</td><td>${e(p+'c',v26)}</td>${pc}</tr>`;
+  });
+  rgTb.innerHTML += `<tr class="row-total row-total-green"><td>TOTAL</td><td>${e('rgtot1',18708)}</td><td>${e('rgtot2',21546)}</td><td>${e('rgtot3',2838)}</td><td>${e('rgtot4','15,17%')}</td></tr>`;
 
   // OVERVIEW ROWS
   const ovRows = [

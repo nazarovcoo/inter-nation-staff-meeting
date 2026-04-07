@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inter Nation — Analytics Dashboard</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f1117; color: #e8e8e8; min-height: 100vh; }
+  .header { background: #161b27; border-bottom: 1px solid #2a2f45; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .header h1 { font-size: 20px; font-weight: 600; color: #fff; }
+  .header h1 span { color: #4f8ef7; }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  .badge { background: #1e3a6e; color: #7eb3ff; font-size: 11px; padding: 4px 10px; border-radius: 20px; border: 1px solid #2d5aa0; }
+  .save-status { font-size: 11px; padding: 4px 12px; border-radius: 20px; transition: all 0.3s; }
+  .save-status.saved { background: #1a3520; color: #4caf80; border: 1px solid #2a5a40; }
+  .save-status.saving { background: #2a2510; color: #ffa040; border: 1px solid #5a4a20; }
+  .btn-reset { font-size: 11px; padding: 4px 12px; border-radius: 20px; background: #2a1515; color: #ff8080; border: 1px solid #5a2525; cursor: pointer; }
+  .btn-reset:hover { background: #3a1a1a; }
+  .tabs { display: flex; gap: 4px; padding: 16px 32px 0; background: #161b27; border-bottom: 1px solid #2a2f45; overflow-x: auto; }
+  .tab { padding: 10px 20px; border-radius: 8px 8px 0 0; border: 1px solid transparent; font-size: 13px; cursor: pointer; transition: all 0.15s; color: #8899aa; white-space: nowrap; background: transparent; }
+  .tab:hover { color: #c0cfe0; background: #1e2535; }
+  .tab.active { color: #fff; background: #0f1117; border-color: #2a2f45; border-bottom-color: #0f1117; }
+  .content { padding: 28px 32px; max-width: 1200px; margin: 0 auto; }
+  .page { display: none; }
+  .page.active { display: block; }
+  .edit-hint { font-size: 12px; color: #7eb3ff; margin-bottom: 16px; padding: 10px 14px; background: #1a2035; border-radius: 8px; border-left: 3px solid #4f8ef7; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { background: #1a2035; color: #8899cc; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; padding: 12px 14px; text-align: left; border-bottom: 1px solid #2a2f45; }
+  td { padding: 11px 14px; border-bottom: 1px solid #1e2535; color: #d0d8e8; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #161d2f; }
+  [contenteditable] { cursor: text; outline: none; border-radius: 4px; transition: background 0.15s; display: inline-block; min-width: 20px; }
+  [contenteditable]:focus { background: #1e3050 !important; outline: 2px solid #4f8ef7; outline-offset: 1px; }
+  [contenteditable]:hover:not(:focus) { background: #1a2540; }
+  .badge-new { background: #1a3520; color: #4caf80; font-size: 11px; padding: 3px 8px; border-radius: 12px; border: 1px solid #2a5a40; font-weight: 600; }
+  .badge-pos { color: #4caf80; font-weight: 600; }
+  .badge-neg { background: #3a1515; color: #ff5555; font-size: 12px; padding: 3px 8px; border-radius: 5px; font-weight: 700; display: inline-block; }
+  .row-total td { background: #f0c020 !important; color: #1a1200 !important; font-weight: 700; font-size: 15px; }
+  .row-tashkent td { background: #d4a800 !important; color: #1a1200 !important; font-weight: 700; }
+  .row-total-green td:last-child { background: #2a6a30 !important; color: #a0ffb0 !important; }
+  .row-tashkent-red td:last-child { background: #6a1515 !important; color: #ff9090 !important; }
+  .row-total [contenteditable]:hover, .row-tashkent [contenteditable]:hover { background: rgba(0,0,0,0.1); }
+  .row-total [contenteditable]:focus, .row-tashkent [contenteditable]:focus { background: rgba(0,0,0,0.15) !important; }
+  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 28px; }
+  .metric { background: #161b27; border: 1px solid #2a2f45; border-radius: 10px; padding: 16px 18px; }
+  .metric-label { font-size: 11px; color: #667799; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+  .metric-value { font-size: 26px; font-weight: 700; color: #fff; }
+  .metric-value.pos { color: #4caf80; }
+  .metric-value.neg { color: #ff5555; }
+  .metric-sub { font-size: 12px; color: #667799; margin-top: 4px; }
+  .trend-up { color: #4caf80; }
+  .trend-down { color: #ff6b6b; }
+  .card { background: #161b27; border: 1px solid #2a2f45; border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
+  .card-header { padding: 14px 18px; border-bottom: 1px solid #2a2f45; }
+  .card-title { font-size: 14px; font-weight: 600; color: #ccd; }
+  .card-body { overflow-x: auto; }
+  .sep-row td { height: 6px; background: #0f1117 !important; padding: 0; }
+  @media(max-width:700px){ .content{padding:16px} .tabs{padding:12px 16px 0} .header{padding:14px 16px} }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Inter <span>Nation</span> — Analytics Dashboard</h1>
+  <div class="header-right">
+    <span class="save-status saved" id="save-status">✓ Сохранено</span>
+    <button class="btn-reset" onclick="resetAll()">↺ Сбросить</button>
+    <span class="badge">Feb 2025 vs Feb 2026</span>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showPage('overview',this)">Обзор</div>
+  <div class="tab" onclick="showPage('students',this)">Студенты по филиалам</div>
+  <div class="tab" onclick="showPage('levels',this)">Уровни</div>
+  <div class="tab" onclick="showPage('age',this)">Возраст</div>
+  <div class="tab" onclick="showPage('newstudents',this)">Новые студенты</div>
+  <div class="tab" onclick="showPage('retention',this)">Удержание</div>
+</div>
+
+<div class="content">
+
+  <div class="page active" id="page-overview">
+    <div class="edit-hint">✏️ <strong>Кликни на любой текст или цифры</strong> — всё редактируется. Изменения сохраняться автоматически!</div>
+    <div class="metrics" id="metrics-grid"></div>
+    <div class="card">
+      <div class="card-header"><span class="card-title" contenteditable="true" data-key="ov-card-title">Топ роста / падения по филиалам</span></div>
+      <div class="card-body"><table><thead><tr>
+        <th contenteditable="true" data-key="ov-h1">Филиал</th>
+        <th contenteditable="true" data-key="ov-h2">Изменение</th>
+        <th contenteditable="true" data-key="ov-h3">%</th>
+        <th contenteditable="true" data-key="ov-h4">Статус</th>
+      </tr></thead><tbody id="overview-tbody"></tbody></table></div>
+    </div>
+  </div>
+
+  <div class="page" id="page-students">
+    <div class="edit-hint">✏️ <strong>Кликай на любую ячейку</strong> — имя, цифры, процент. Всё сохраняется!</div>
+    <div class="card">
+      <div class="card-header"><span class="card-title" contenteditable="true" data-key="st-card-title">Студенты по филиалам — Feb 2025 vs Feb 2026</span></div>
+      <div class="card-body"><table><thead><tr>
+        <th contenteditable="true" data-key="st-h1">Филиал</th>
+        <th contenteditable="true" data-key="st-h2">Feb 2025</th>
+        <th contenteditable="true" data-key="st-h3">Feb 2026</th>
+        <th contenteditable="true" data-key="st-h4">Изм. (рел.)</th>
+        <th contenteditable="true" data-key="st-h5">Изм. (%)</th>
+      </tr></thead><tbody id="branch-tbody"></tbody></table></div>
+    </div>
+  </div>
+
+  <div class="page" id="page-levels">
+    <div class="edit-hint">✏️ <strong>Кликай на любую ячейку</strong> для редактирования. Всё сохраняется!</div>
+    <div class="card">
+      <div class="card-header"><span class="card-title" contenteditable="true" data-key="lv-card-title">Распределение по уровням — Samarkand Feb 2026</span></div>
+      <div class="card-body"><table><thead><tr>
+        <th contenteditable="true" data-key="lv-h1">Уровень</th>
+        <th contenteditable="true" data-key="lv-h2">2025</th>
+        <th contenteditable="true" data-key="lv-h3">2025 %</th>
+        <th contenteditable="true" data-key="lv-h4">2026 %</th>
+        <th contenteditable="true" data-key="lv-h5">2026</th>
+      </tr></thead><tbody id="levels-tbody"></tbody></table></div>
+    </div>
+  </div>
+
+  <div class="page" id="page-age">
+    <div class="edit-hint">✏️ <strong>Кликай на любую ячейку</strong> для редактирования. Всё сохраняется!</div>
+    <div class="card">
+      <div class="card-header"><span class="card-title" contenteditable="true" data-key="ag-card-title">Распределение по возрасту — Samarkand Feb 2026</span></div>
+      <div class="card-body"><table><thead><tr>
+        <th contenteditable="true" data-key="ag-h1">Возраст</th>
+        <th contenteditable="true" data-key="ag-h2">2025</th>
+        <th contenteditable="true" data-key="ag-h3">2025 %</th>
+        <th contenteditable="true" data-key="ag-h4">2026 %</th>
+        <th contenteditable="true" data-key="ag-h5">2026</th>
+      </tr></thead><tbody id="age-tbody"></tbody></table></div>
+    </div>
+  </div>
+
+  <div class="page" id="page-newstudents">
+    <div class="edit-hint">✏️ <strong>Кликай на любую ячейку</strong> для редактирования. Всё сохраняется!</div>
+    <div class="card">
+      <div class="card-header"><span class="card-title" contenteditable="true" data-key="nw-card-title">Новые студенты по филиалам — Feb 2026 vs Feb 2025</span></div>
+      <div class="card-body"><table><thead><tr>
+        <th contenteditable="true" data-key="nw-h1">Филиал</th>
+        <th contenteditable="true" data-key="nw-h2">2025</th>
+        <th contenteditable="true" data-key="nw-h3">2026</th>
+        <th contenteditable="true" data-key="nw-h4">Изм. (рел.)</th>
+        <th contenteditable="true" data-key="nw-h5">Изм. (%)</th>
+      </tr></thead><tbody id="new-tbody"></tbody></table></div>
+    </div>
+  </div>
+
+  <div class="page" id="page-retention">
+    <div class="edit-hint">✏️ <strong>Кликай на любую ячейку</strong> для редактирования. Всё сохраняется!</div>
+    <div class="card">
+      <div class="card-header"><span class="card-title" contenteditable="true" data-key="rt-card-title">Удержание: January → February (по уровням)</span></div>
+      <div class="card-body"><table><thead><tr>
+        <th contenteditable="true" data-key="rt-h1">Уровень</th>
+        <th contenteditable="true" data-key="rt-h2">2025 Jan</th>
+        <th contenteditable="true" data-key="rt-h3">Ушли Feb 2025</th>
+        <th contenteditable="true" data-key="rt-h4">Loss % 2025</th>
+        <th contenteditable="true" data-key="rt-h5">2026 Jan</th>
+        <th contenteditable="true" data-key="rt-h6">Ушли Feb 2026</th>
+        <th contenteditable="true" data-key="rt-h7">Loss % 2026</th>
+        <th contenteditable="true" data-key="rt-h8">Тренд</th>
+      </tr></thead><tbody id="retention-tbody"></tbody></table></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const STORE_KEY = 'internation_v3';
+let saveTimer = null;
+
+function getStore(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY))||{}; }catch(e){ return {}; } }
+function setStore(d){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(d)); }catch(e){} }
+function val(key, def){ const s=getStore(); return s[key]!==undefined ? s[key] : String(def); }
+function save(key, v){
+  const s=getStore(); s[key]=v; setStore(s);
+  const el=document.getElementById('save-status');
+  el.textContent='⏳ Сохраняю...'; el.className='save-status saving';
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{ el.textContent='✓ Сохранено'; el.className='save-status saved'; }, 700);
+}
+
+function showPage(id, el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  el.classList.add('active');
+}
+
+function resetAll(){
+  if(!confirm('Сбросить все изменения к исходным данным?')) return;
+  localStorage.removeItem(STORE_KEY);
+  location.reload();
+}
+
+function e(key, def){
+  return `<span contenteditable="true" data-key="${key}">${val(key, def)}</span>`;
+}
+
+function attachEditable(el){
+  el.addEventListener('input', ()=>{ save(el.dataset.key, el.textContent); });
+  el.addEventListener('keydown', ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); el.blur(); } });
+}
+
+function initAll(){
+  document.querySelectorAll('[contenteditable][data-key]').forEach(el=>{
+    const stored = val(el.dataset.key, null);
+    if(stored !== null && el.textContent !== stored) el.textContent = stored;
+    attachEditable(el);
+  });
+}
+
+// METRICS
+const metricsData = [
+  ['mv-lbl-1','Total Feb 2025','mv-val-1','19 530','mv-sub-1','студентов',''],
+  ['mv-lbl-2','Total Feb 2026','mv-val-2','21 987','mv-sub-2','студентов',''],
+  ['mv-lbl-3','Рост (рел.)','mv-val-3','+2 457','mv-sub-3','человек','pos'],
+  ['mv-lbl-4','Рост %','mv-val-4','+12,58%','mv-sub-4','год к году','pos'],
+  ['mv-lbl-5','Ташкент 2026','mv-val-5','-4,03%','mv-sub-5','снижение','neg'],
+  ['mv-lbl-6','Новых филиалов','mv-val-6','3','mv-sub-6','Andijan, Online, Yunusabad','pos'],
+];
+const mg = document.getElementById('metrics-grid');
+metricsData.forEach(([kl,lbl,kv,v,ks,sub,cls])=>{
+  mg.innerHTML += `<div class="metric">
+    <div class="metric-label" contenteditable="true" data-key="${kl}">${lbl}</div>
+    <div class="metric-value ${cls}" contenteditable="true" data-key="${kv}">${v}</div>
+    <div class="metric-sub" contenteditable="true" data-key="${ks}">${sub}</div>
+  </div>`;
+});
+
+// OVERVIEW ROWS
+const ovRows = [
+  ['ov-r1n','Samarkand','ov-r1c','+964','ov-r1p','+84,27%','pos','ov-r1s','Лидер'],
+  ['ov-r2n','Beruniy','ov-r2c','+349','ov-r2p','+28,01%','pos','ov-r2s','Хорошо'],
+  ['ov-r3n','Sergeli','ov-r3c','+237','ov-r3p','+22,70%','pos','ov-r3s','Хорошо'],
+  null,
+  ['ov-r4n','Xalqlar Dostligi','ov-r4c','-595','ov-r4p','-17,87%','neg','ov-r4s','Проблема'],
+  ['ov-r5n','Minor','ov-r5c','-239','ov-r5p','-20,03%','neg','ov-r5s','Проблема'],
+  ['ov-r6n','C-1','ov-r6c','-204','ov-r6p','-18,66%','neg','ov-r6s','Проблема'],
+];
+const ovTb = document.getElementById('overview-tbody');
+ovRows.forEach(r=>{
+  if(!r){ ovTb.innerHTML+=`<tr class="sep-row"><td colspan="4"></td></tr>`; return; }
+  const [kn,n,kc,chg,kp,pct,type,ks,st]=r;
+  const pctEl = type==='neg' ? `<span class="badge-neg">${e(kp,pct)}</span>` : `<span class="badge-pos">${e(kp,pct)}</span>`;
+  ovTb.innerHTML+=`<tr><td>${e(kn,n)}</td><td>${e(kc,chg)}</td><td>${pctEl}</td><td>${e(ks,st)}</td></tr>`;
+});
+
+// BRANCH TABLE
+const brData = [
+  ['br0','Samarkand',1144,2108,964,'84,27%','pos'],
+  ['br1','Andijan',0,1141,1141,'NEW','new'],
+  ['br2','Online',0,1093,1093,'NEW','new'],
+  ['br3','Sergeli',1044,1281,237,'22,70%','pos'],
+  ['br4','Beruniy',1246,1595,349,'28,01%','pos'],
+  ['br5','Minor',1193,954,-239,'-20,03%','neg'],
+  ['br6','Chilonzor',2201,2224,23,'1,04%','pos'],
+  ['br7','Maksim Gorkiy',2183,2071,-112,'-5,13%','neg'],
+  ['br8','Westminster',2224,2071,-153,'-6,88%','neg'],
+  ['br9','Ganga',907,841,-66,'-7,28%','neg'],
+  ['br10','Oybek',2966,2622,-344,'-11,60%','neg'],
+  ['br11','Xalqlar Dostligi',3329,2734,-595,'-17,87%','neg'],
+  ['br12','Yunusabad',0,363,363,'NEW','new'],
+  ['br13','C-1',1093,889,-204,'-18,66%','neg'],
+];
+const bTb = document.getElementById('branch-tbody');
+brData.forEach(([p,n,v25,v26,chg,pct,type])=>{
+  let pc;
+  if(type==='new') pc=`<td>${e(p+'d',chg)}</td><td><span class="badge-new">NEW</span></td>`;
+  else if(type==='neg') pc=`<td>${e(p+'d',chg)}</td><td><span class="badge-neg">${e(p+'e',pct)}</span></td>`;
+  else pc=`<td>${e(p+'d',chg)}</td><td><span class="badge-pos">${e(p+'e',pct)}</span></td>`;
+  bTb.innerHTML+=`<tr><td>${e(p+'a',n)}</td><td>${e(p+'b',v25)}</td><td>${e(p+'c',v26)}</td>${pc}</tr>`;
+});
+bTb.innerHTML+=`<tr class="row-tashkent row-tashkent-red"><td>TASHKENT</td><td>${e('bt1',18386)}</td><td>${e('bt2',17645)}</td><td>${e('bt3',-741)}</td><td>${e('bt4','-4,03%')}</td></tr>`;
+bTb.innerHTML+=`<tr class="row-total row-total-green"><td>TOTAL</td><td>${e('btot1',19530)}</td><td>${e('btot2',21987)}</td><td>${e('btot3',2457)}</td><td>${e('btot4','12,58%')}</td></tr>`;
+
+// LEVELS
+const lvData=[
+  ['lv0','Beginner',759,'30.1%','54.3%',1586],
+  ['lv1','Elementary',397,'15.7%','14.8%',433],
+  ['lv2','Pre-Intermediate',385,'15.2%','11.0%',320],
+  ['lv3','Intermediate',298,'11.8%','10.2%',299],
+  ['lv4','Upper-Intermediate',349,'13.8%','4.4%',129],
+  ['lv5','IELTS',337,'13.3%','5.3%',154],
+];
+const lvTb=document.getElementById('levels-tbody');
+lvData.forEach(([p,n,v25,p25,p26,v26])=>{
+  lvTb.innerHTML+=`<tr><td>${e(p+'a',n)}</td><td>${e(p+'b',v25)}</td><td>${e(p+'c',p25)}</td><td>${e(p+'d',p26)}</td><td>${e(p+'e',v26)}</td></tr>`;
+});
+lvTb.innerHTML+=`<tr class="row-total"><td></td><td>${e('lvt1',2525)}</td><td></td><td></td><td>${e('lvt2',2921)}</td></tr>`;
+
+// AGE
+const agData=[
+  ['ag0','0-14',117,'4.6%','17.8%',520],
+  ['ag1','15-16',547,'21.7%','23.7%',692],
+  ['ag2','17-18',621,'24.6%','16.6%',485],
+  ['ag3','19-20',398,'15.8%','11.6%',338],
+  ['ag4','21-25',511,'20.2%','15.1%',441],
+  ['ag5','26-30',230,'9.1%','8.0%',234],
+  ['ag6','31-70',101,'4.0%','7.2%',211],
+];
+const agTb=document.getElementById('age-tbody');
+agData.forEach(([p,n,v25,p25,p26,v26])=>{
+  agTb.innerHTML+=`<tr><td>${e(p+'a',n)}</td><td>${e(p+'b',v25)}</td><td>${e(p+'c',p25)}</td><td>${e(p+'d',p26)}</td><td>${e(p+'e',v26)}</td></tr>`;
+});
+agTb.innerHTML+=`<tr class="row-total"><td></td><td>${e('agt1',2525)}</td><td></td><td></td><td>${e('agt2',2921)}</td></tr>`;
+
+// NEW STUDENTS
+const nwData=[
+  ['nw0','Online',0,440,440,'NEW','new'],
+  ['nw1','Andijan',0,213,213,'NEW','new'],
+  ['nw2','Samarkand',370,292,-78,'-21.1%','neg'],
+  ['nw3','Maksim Gorkiy',260,186,-74,'-28.5%','neg'],
+  ['nw4','Minor',181,130,-51,'-28.2%','neg'],
+  ['nw5','Sergeli',167,123,-44,'-26.3%','neg'],
+  ['nw6','Xalqlar Dostligi',347,261,-86,'-24.8%','neg'],
+  ['nw7','Chilonzor',284,216,-68,'-23.9%','neg'],
+  ['nw8','C1',110,86,-24,'-21.8%','neg'],
+  ['nw9','Ganga',109,94,-15,'-13.8%','neg'],
+  ['nw10','Westminster',178,172,-6,'-3.4%','neg'],
+  ['nw11','Beruniy',211,207,-4,'-1.9%','neg'],
+  ['nw12','Oybek',308,304,-4,'-1.3%','neg'],
+  ['nw13','Yunusabad',0,197,197,'NEW','new'],
+];
+const nwTb=document.getElementById('new-tbody');
+nwData.forEach(([p,n,v25,v26,chg,pct,type])=>{
+  let pc;
+  if(type==='new') pc=`<td>${e(p+'d',chg)}</td><td><span class="badge-new">NEW</span></td>`;
+  else pc=`<td>${e(p+'d',chg)}</td><td><span class="badge-neg">${e(p+'e',pct)}</span></td>`;
+  nwTb.innerHTML+=`<tr><td>${e(p+'a',n)}</td><td>${e(p+'b',v25)}</td><td>${e(p+'c',v26)}</td>${pc}</tr>`;
+});
+nwTb.innerHTML+=`<tr class="row-tashkent row-tashkent-red"><td>TASHKENT</td><td>${e('nwt1',2155)}</td><td>${e('nwt2',1976)}</td><td>${e('nwt3',-179)}</td><td>${e('nwt4','-8,31%')}</td></tr>`;
+nwTb.innerHTML+=`<tr class="row-total row-total-green"><td>TOTAL</td><td>${e('nwtot1',2525)}</td><td>${e('nwtot2',2921)}</td><td>${e('nwtot3',396)}</td><td>${e('nwtot4','15,68%')}</td></tr>`;
+
+// RETENTION
+const rtData=[
+  ['rt0','Beginner',2932,325,'11.1%',3607,385,'10.7%','Улучшение'],
+  ['rt1','Elementary',4513,331,'7.3%',4642,353,'7.6%','Чуть хуже'],
+  ['rt2','Pre-Intermediate',3896,315,'8.1%',3976,335,'8.4%','Чуть хуже'],
+  ['rt3','Intermediate',2863,276,'9.6%',2967,224,'7.6%','Улучшение'],
+  ['rt4','IELTS',2666,268,'10.1%',3627,263,'7.3%','Улучшение'],
+  ['rt5','Upper-Intermediate',2263,223,'9.9%',2626,224,'8.5%','Улучшение'],
+];
+const rtTb=document.getElementById('retention-tbody');
+rtData.forEach(([p,lvl,j25,l25,lp25,j26,l26,lp26,trend])=>{
+  const stored = val(p+'h', trend);
+  const cls = stored==='Улучшение' ? 'trend-up' : 'trend-down';
+  rtTb.innerHTML+=`<tr>
+    <td>${e(p+'a',lvl)}</td><td>${e(p+'b',j25)}</td><td>${e(p+'c',l25)}</td><td>${e(p+'d',lp25)}</td>
+    <td>${e(p+'e',j26)}</td><td>${e(p+'f',l26)}</td><td>${e(p+'g',lp26)}</td>
+    <td class="${cls}" style="font-weight:600">${e(p+'h',trend)}</td>
+  </tr>`;
+});
+
+initAll();
+</script>
+</body>
+</html>

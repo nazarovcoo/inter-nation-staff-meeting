@@ -67,7 +67,7 @@
   <div class="header-right">
     <span class="save-status saved" id="save-status">✓ Сохранено</span>
     <button class="btn-reset" onclick="resetAll()">↺ Сбросить</button>
-    <span class="badge">Feb 2025 vs Feb 2026</span>
+    <span class="badge">Mar 2025 vs Mar 2026</span>
   </div>
 </div>
 
@@ -99,11 +99,11 @@
   <div class="page" id="page-students">
     <div class="edit-hint">✏️ <strong>Кликай на любую ячейку</strong> — имя, цифры, процент. Всё сохраняется онлайн!</div>
     <div class="card">
-      <div class="card-header"><span class="card-title" contenteditable="true" data-key="st-card-title">Студенты по филиалам — Feb 2025 vs Feb 2026</span></div>
+      <div class="card-header"><span class="card-title" contenteditable="true" data-key="st-card-title">Студенты по филиалам — Mar 2025 vs Mar 2026</span></div>
       <div class="card-body"><table><thead><tr>
         <th contenteditable="true" data-key="st-h1">Филиал</th>
-        <th contenteditable="true" data-key="st-h2">Feb 2025</th>
-        <th contenteditable="true" data-key="st-h3">Feb 2026</th>
+        <th contenteditable="true" data-key="st-h2">Mar 2025</th>
+        <th contenteditable="true" data-key="st-h3">Mar 2026</th>
         <th contenteditable="true" data-key="st-h4">Изм. (рел.)</th>
         <th contenteditable="true" data-key="st-h5">Изм. (%)</th>
       </tr></thead><tbody id="branch-tbody"></tbody></table></div>
@@ -252,11 +252,11 @@ function applyFirebaseUpdate(key, value) {
 function buildUI() {
   // METRICS
   const metricsData = [
-    ['mv-lbl-1','Total Feb 2025','mv-val-1','19 530','mv-sub-1','студентов',''],
-    ['mv-lbl-2','Total Feb 2026','mv-val-2','21 987','mv-sub-2','студентов',''],
-    ['mv-lbl-3','Рост (рел.)','mv-val-3','+2 457','mv-sub-3','человек','pos'],
-    ['mv-lbl-4','Рост %','mv-val-4','+12,58%','mv-sub-4','год к году','pos'],
-    ['mv-lbl-5','Ташкент 2026','mv-val-5','-4,03%','mv-sub-5','снижение','neg'],
+    ['mv-lbl-1','Total Mar 2025','mv-val-1','18 708','mv-sub-1','студентов',''],
+    ['mv-lbl-2','Total Mar 2026','mv-val-2','21 546','mv-sub-2','студентов',''],
+    ['mv-lbl-3','Рост (рел.)','mv-val-3','+2 838','mv-sub-3','человек','pos'],
+    ['mv-lbl-4','Рост %','mv-val-4','+15,17%','mv-sub-4','год к году','pos'],
+    ['mv-lbl-5','Ташкент 2026','mv-val-5','-2,13%','mv-sub-5','снижение','neg'],
     ['mv-lbl-6','Новых филиалов','mv-val-6','3','mv-sub-6','Andijan, Online, Yunusabad','pos'],
   ];
   const mg = document.getElementById('metrics-grid');
@@ -271,13 +271,13 @@ function buildUI() {
 
   // OVERVIEW ROWS
   const ovRows = [
-    ['ov-r1n','Samarkand','ov-r1c','+964','ov-r1p','+84,27%','pos','ov-r1s','Лидер'],
-    ['ov-r2n','Beruniy','ov-r2c','+349','ov-r2p','+28,01%','pos','ov-r2s','Хорошо'],
-    ['ov-r3n','Sergeli','ov-r3c','+237','ov-r3p','+22,70%','pos','ov-r3s','Хорошо'],
+    ['ov-r1n','Samarkand','ov-r1c','+850','ov-r1p','+70,07%','pos','ov-r1s','Лидер'],
+    ['ov-r2n','Beruniy','ov-r2c','+285','ov-r2p','+22,28%','pos','ov-r2s','Хорошо'],
+    ['ov-r3n','Sergeli','ov-r3c','+242','ov-r3p','+23,56%','pos','ov-r3s','Хорошо'],
     null,
-    ['ov-r4n','Xalqlar Dostligi','ov-r4c','-595','ov-r4p','-17,87%','neg','ov-r4s','Проблема'],
-    ['ov-r5n','Minor','ov-r5c','-239','ov-r5p','-20,03%','neg','ov-r5s','Проблема'],
-    ['ov-r6n','C-1','ov-r6c','-204','ov-r6p','-18,66%','neg','ov-r6s','Проблема'],
+    ['ov-r4n','Xalqlar Dostligi','ov-r4c','-538','ov-r4p','-17,17%','neg','ov-r4s','Проблема'],
+    ['ov-r5n','Westminster','ov-r5c','-282','ov-r5p','-13,60%','neg','ov-r5s','Проблема'],
+    ['ov-r6n','Minor','ov-r6c','-281','ov-r6p','-23,75%','neg','ov-r6s','Проблема'],
   ];
   const ovTb = document.getElementById('overview-tbody');
   ovTb.innerHTML = '';
@@ -290,20 +290,20 @@ function buildUI() {
 
   // BRANCH TABLE
   const brData = [
-    ['br0','Samarkand',1144,2108,964,'84,27%','pos'],
-    ['br1','Andijan',0,1141,1141,'NEW','new'],
-    ['br2','Online',0,1093,1093,'NEW','new'],
-    ['br3','Sergeli',1044,1281,237,'22,70%','pos'],
-    ['br4','Beruniy',1246,1595,349,'28,01%','pos'],
-    ['br5','Minor',1193,954,-239,'-20,03%','neg'],
-    ['br6','Chilonzor',2201,2224,23,'1,04%','pos'],
-    ['br7','Maksim Gorkiy',2183,2071,-112,'-5,13%','neg'],
-    ['br8','Westminster',2224,2071,-153,'-6,88%','neg'],
-    ['br9','Ganga',907,841,-66,'-7,28%','neg'],
-    ['br10','Oybek',2966,2622,-344,'-11,60%','neg'],
-    ['br11','Xalqlar Dostligi',3329,2734,-595,'-17,87%','neg'],
-    ['br12','Yunusabad',0,363,363,'NEW','new'],
-    ['br13','C-1',1093,889,-204,'-18,66%','neg'],
+    ['br0','Samarkand',1213,2063,850,'70,07%','pos'],
+    ['br1','Andijan',0,1196,1196,'NEW','new'],
+    ['br2','Online',0,1164,1164,'NEW','new'],
+    ['br3','Sergeli',1027,1269,242,'23,56%','pos'],
+    ['br4','Beruniy',1279,1564,285,'22,28%','pos'],
+    ['br5','Minor',1183,902,-281,'-23,75%','neg'],
+    ['br6','Chilonzor',2046,2110,64,'3,13%','pos'],
+    ['br7','Maksim Gorkiy',2130,1956,-174,'-8,17%','neg'],
+    ['br8','Westminster',2074,1792,-282,'-13,60%','neg'],
+    ['br9','Ganga',838,804,-34,'-4,06%','neg'],
+    ['br10','Oybek',2767,2802,35,'1,27%','pos'],
+    ['br11','Xalqlar Dostligi',3133,2595,-538,'-17,17%','neg'],
+    ['br12','Yunusabad',0,483,483,'NEW','new'],
+    ['br13','C-1',1018,846,-172,'-16,90%','neg'],
   ];
   const bTb = document.getElementById('branch-tbody');
   bTb.innerHTML = '';
@@ -314,8 +314,8 @@ function buildUI() {
     else pc = `<td>${e(p+'d',chg)}</td><td><span class="badge-pos">${e(p+'e',pct)}</span></td>`;
     bTb.innerHTML += `<tr><td>${e(p+'a',n)}</td><td>${e(p+'b',v25)}</td><td>${e(p+'c',v26)}</td>${pc}</tr>`;
   });
-  bTb.innerHTML += `<tr class="row-tashkent row-tashkent-red"><td>TASHKENT</td><td>${e('bt1',18386)}</td><td>${e('bt2',17645)}</td><td>${e('bt3',-741)}</td><td>${e('bt4','-4,03%')}</td></tr>`;
-  bTb.innerHTML += `<tr class="row-total row-total-green"><td>TOTAL</td><td>${e('btot1',19530)}</td><td>${e('btot2',21987)}</td><td>${e('btot3',2457)}</td><td>${e('btot4','12,58%')}</td></tr>`;
+  bTb.innerHTML += `<tr class="row-tashkent row-tashkent-red"><td>TASHKENT</td><td>${e('bt1',17495)}</td><td>${e('bt2',17123)}</td><td>${e('bt3',-372)}</td><td>${e('bt4','-2,13%')}</td></tr>`;
+  bTb.innerHTML += `<tr class="row-total row-total-green"><td>TOTAL</td><td>${e('btot1',18708)}</td><td>${e('btot2',21546)}</td><td>${e('btot3',2838)}</td><td>${e('btot4','15,17%')}</td></tr>`;
 
   // LEVELS
   const lvData = [

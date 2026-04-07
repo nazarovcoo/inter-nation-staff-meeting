@@ -23,8 +23,6 @@
   .content { padding: 28px 32px; max-width: 1200px; margin: 0 auto; }
   .page { display: none; }
   .page.active { display: block; }
-  .edit-hint { font-size: 12px; color: #7eb3ff; margin-bottom: 16px; padding: 10px 14px; background: #1a2035; border-radius: 8px; border-left: 3px solid #4f8ef7; }
-
   /* TABLE SYSTEM — единый контракт для всех таблиц */
   table { width: 100%; border-collapse: collapse; font-size: 14px; }
   th { background: #1a2035; color: #8899cc; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; padding: 12px 16px; text-align: right; border-bottom: 2px solid #2a2f45; white-space: nowrap; }
@@ -33,11 +31,6 @@
   td:first-child { text-align: left; }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: #161d2f; }
-
-  /* CONTENTEDITABLE — только на span внутри td, не на th */
-  [contenteditable] { cursor: text; outline: none; border-radius: 4px; transition: background 0.15s; }
-  [contenteditable]:focus { background: #1e3050 !important; outline: 2px solid #4f8ef7; outline-offset: 1px; }
-  [contenteditable]:hover:not(:focus) { background: #1a2540; }
 
   /* BADGES */
   .badge-new { background: #1a3520; color: #4caf80; font-size: 11px; padding: 3px 8px; border-radius: 12px; border: 1px solid #2a5a40; font-weight: 600; }
@@ -97,8 +90,6 @@
   body.light th { background: #f5f7fa; color: #4a5568; border-bottom-color: #d8dce5; }
   body.light td { color: #1a1a2e; border-bottom-color: #e8ecf2; }
   body.light tr:hover td { background: #f5f7fa; }
-  body.light [contenteditable]:focus { background: #e3edff !important; }
-  body.light [contenteditable]:hover:not(:focus) { background: #f0f2f8; }
   body.light .badge-pos { color: #0a8a40; }
   body.light .badge-neg { background: #ffe0e0; color: #cc2222; }
   body.light .badge-new { background: #e0f5e8; color: #0a8a40; border-color: #a0d8b0; }
@@ -143,10 +134,9 @@
 <div class="content">
 
   <div class="page active" id="page-overview">
-    <div class="edit-hint">✏️ <strong>Кликни на любой текст или цифры</strong> — всё редактируется. Изменения сохраняются онлайн и видны всем!</div>
     <div class="metrics" id="metrics-grid"></div>
     <div class="card">
-      <div class="card-header"><span class="card-title" contenteditable="true" data-key="rg-card-title">Итого по регионам</span></div>
+      <div class="card-header"><span class="card-title">Итого по регионам</span></div>
       <div class="card-body"><table><thead><tr>
         <th>Регион</th>
         <th>Mar 2025</th>
@@ -157,7 +147,7 @@
     </div>
 
     <div class="card">
-      <div class="card-header"><span class="card-title" contenteditable="true" data-key="ov-card-title">Топ роста / падения по филиалам</span></div>
+      <div class="card-header"><span class="card-title">Топ роста / падения по филиалам</span></div>
       <div class="card-body"><table><thead><tr>
         <th>Филиал</th>
         <th>Изменение</th>
@@ -168,9 +158,8 @@
   </div>
 
   <div class="page" id="page-students">
-    <div class="edit-hint">✏️ <strong>Кликай на любую ячейку</strong> — имя, цифры, процент. Всё сохраняется онлайн!</div>
     <div class="card">
-      <div class="card-header"><span class="card-title" contenteditable="true" data-key="st-card-title">Студенты по филиалам — Mar 2025 vs Mar 2026</span></div>
+      <div class="card-header"><span class="card-title">Студенты по филиалам — Mar 2025 vs Mar 2026</span></div>
       <div class="card-body"><table><thead><tr>
         <th>Филиал</th>
         <th>Mar 2025</th>
@@ -182,9 +171,8 @@
   </div>
 
   <div class="page" id="page-registered">
-    <div class="edit-hint">✏️ <strong>Кликай на любую ячейку</strong> для редактирования. Всё сохраняется онлайн!</div>
     <div class="card">
-      <div class="card-header"><span class="card-title" contenteditable="true" data-key="lv-card-title">Распределение по уровням — Mar 2025 vs Mar 2026</span></div>
+      <div class="card-header"><span class="card-title">Распределение по уровням — Mar 2025 vs Mar 2026</span></div>
       <div class="card-body"><table><thead><tr>
         <th>Уровень</th>
         <th>Mar 2025</th>
@@ -195,7 +183,7 @@
     </div>
 
     <div class="card">
-      <div class="card-header"><span class="card-title" contenteditable="true" data-key="ag-card-title">Распределение по возрасту — Mar 2025 vs Mar 2026</span></div>
+      <div class="card-header"><span class="card-title">Распределение по возрасту — Mar 2025 vs Mar 2026</span></div>
       <div class="card-body"><table><thead><tr>
         <th>Возраст</th>
         <th>Mar 2025</th>
@@ -206,7 +194,7 @@
     </div>
 
     <div class="card">
-      <div class="card-header"><span class="card-title" contenteditable="true" data-key="nw-card-title">Новые студенты по филиалам — Mar 2026 vs Mar 2025</span></div>
+      <div class="card-header"><span class="card-title">Новые студенты по филиалам — Mar 2026 vs Mar 2025</span></div>
       <div class="card-body"><table><thead><tr>
         <th>Филиал</th>
         <th>Mar 2025</th>
@@ -218,9 +206,8 @@
   </div>
 
   <div class="page" id="page-retention">
-    <div class="edit-hint">✏️ <strong>Кликай на любую ячейку</strong> для редактирования. Всё сохраняется онлайн!</div>
     <div class="card">
-      <div class="card-header"><span class="card-title" contenteditable="true" data-key="rt-card-title">Удержание: February → March (по уровням)</span></div>
+      <div class="card-header"><span class="card-title">Удержание: February → March (по уровням)</span></div>
       <div class="card-body"><table><thead><tr>
         <th>Уровень</th>
         <th>2025 Feb</th>
@@ -235,9 +222,8 @@
   </div>
 
   <div class="page" id="page-leads">
-    <div class="edit-hint">✏️ <strong>Кликай на любую ячейку</strong> для редактирования. Всё сохраняется онлайн!</div>
     <div class="card">
-      <div class="card-header"><span class="card-title" contenteditable="true" data-key="ld-card-title">Registered Leads by Level — Mar 2025 vs Mar 2026</span></div>
+      <div class="card-header"><span class="card-title">Registered Leads by Level — Mar 2025 vs Mar 2026</span></div>
       <div class="card-body"><table><thead><tr>
         <th>Уровень</th>
         <th>Mar 2025</th>
@@ -336,22 +322,11 @@ function resetAll() {
 }
 
 function e(key, def) {
-  return `<span contenteditable="true" data-key="${key}">${val(key, def)}</span>`;
-}
-
-function attachEditable(el) {
-  el.addEventListener('input', () => { save(el.dataset.key, el.textContent); });
-  el.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); el.blur(); } });
+  return val(key, def);
 }
 
 function initAll() {
-  document.querySelectorAll('[contenteditable][data-key]').forEach(el => {
-    const key = el.dataset.key;
-    if (firebaseData[key] !== undefined && firebaseData[key] !== null && firebaseData[key] !== 'null') {
-      if (el.textContent !== firebaseData[key]) el.textContent = firebaseData[key];
-    }
-    attachEditable(el);
-  });
+  // read-only mode — no editing
 }
 
 // Update elements when Firebase data changes (real-time sync)

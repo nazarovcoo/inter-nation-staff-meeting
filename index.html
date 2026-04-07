@@ -26,14 +26,16 @@
   .page { display: none; }
   .page.active { display: block; }
   .edit-hint { font-size: 12px; color: #7eb3ff; margin-bottom: 16px; padding: 10px 14px; background: #1a2035; border-radius: 8px; border-left: 3px solid #4f8ef7; }
-  table { width: 100%; border-collapse: collapse; font-size: 14px; table-layout: fixed; }
-  th { background: #1a2035; color: #8899cc; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; padding: 12px 14px; text-align: right; border-bottom: 1px solid #2a2f45; }
-  th:first-child { text-align: left; }
-  td { padding: 11px 14px; border-bottom: 1px solid #1e2535; color: #d0d8e8; vertical-align: middle; text-align: right; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { white-space: nowrap; }
+  th { background: #1a2035; color: #8899cc; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; padding: 12px 16px; text-align: right; border-bottom: 1px solid #2a2f45; }
+  th:first-child { text-align: left; width: 22%; }
+  td { padding: 11px 16px; border-bottom: 1px solid #1e2535; color: #d0d8e8; vertical-align: middle; text-align: right; }
   td:first-child { text-align: left; }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: #161d2f; }
-  [contenteditable] { cursor: text; outline: none; border-radius: 4px; transition: background 0.15s; display: inline-block; min-width: 20px; }
+  [contenteditable] { cursor: text; outline: none; border-radius: 4px; transition: background 0.15s; min-width: 20px; }
+  th[contenteditable], td [contenteditable] { display: inline; }
   [contenteditable]:focus { background: #1e3050 !important; outline: 2px solid #4f8ef7; outline-offset: 1px; }
   [contenteditable]:hover:not(:focus) { background: #1a2540; }
   .badge-new { background: #1a3520; color: #4caf80; font-size: 11px; padding: 3px 8px; border-radius: 12px; border: 1px solid #2a5a40; font-weight: 600; }

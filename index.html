@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Inter Nation — Analytics Dashboard</title>
 <style>
-  /* v2.0 — full table alignment fix */
+  /* v3.0 — dynamic Firebase data */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f1117; color: #e8e8e8; min-height: 100vh; }
   .header { background: #161b27; border-bottom: 1px solid #2a2f45; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
@@ -13,9 +13,11 @@
   .header h1 span { color: #4f8ef7; }
   .header-right { display: flex; align-items: center; gap: 10px; }
   .badge { background: #1e3a6e; color: #7eb3ff; font-size: 11px; padding: 4px 10px; border-radius: 20px; border: 1px solid #2d5aa0; }
-  .save-status { font-size: 11px; padding: 4px 12px; border-radius: 20px; transition: all 0.3s; }
+  .month-select { background: #1e3a6e; color: #7eb3ff; font-size: 11px; padding: 4px 10px; border-radius: 20px; border: 1px solid #2d5aa0; cursor: pointer; outline: none; }
+  .month-select option { background: #161b27; color: #e8e8e8; }
+  .save-status { font-size: 11px; padding: 4px 12px; border-radius: 20px; }
   .save-status.saved { background: #1a3520; color: #4caf80; border: 1px solid #2a5a40; }
-  .save-status.saving { background: #2a2510; color: #ffa040; border: 1px solid #5a4a20; }
+  .save-status.loading { background: #2a2510; color: #ffa040; border: 1px solid #5a4a20; }
   .tabs { display: flex; gap: 4px; padding: 16px 32px 0; background: #161b27; border-bottom: 1px solid #2a2f45; overflow-x: auto; }
   .tab { padding: 10px 20px; border-radius: 8px 8px 0 0; border: 1px solid transparent; font-size: 13px; cursor: pointer; transition: all 0.15s; color: #8899aa; white-space: nowrap; background: transparent; }
   .tab:hover { color: #c0cfe0; background: #1e2535; }
@@ -23,7 +25,6 @@
   .content { padding: 28px 32px; max-width: 1200px; margin: 0 auto; }
   .page { display: none; }
   .page.active { display: block; }
-  /* TABLE SYSTEM — единый контракт для всех таблиц */
   table { width: 100%; border-collapse: collapse; font-size: 14px; }
   th { background: #1a2035; color: #8899cc; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; padding: 12px 16px; text-align: right; border-bottom: 2px solid #2a2f45; white-space: nowrap; }
   th:first-child { text-align: left; }
@@ -31,19 +32,13 @@
   td:first-child { text-align: left; }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: #161d2f; }
-
-  /* BADGES */
   .badge-new { background: #1a3520; color: #4caf80; font-size: 11px; padding: 3px 8px; border-radius: 12px; border: 1px solid #2a5a40; font-weight: 600; }
   .badge-pos { color: #4caf80; font-weight: 600; }
   .badge-neg { background: #3a1515; color: #ff5555; font-size: 12px; padding: 3px 8px; border-radius: 5px; font-weight: 700; }
-
-  /* SPECIAL ROWS */
   .row-total td { background: #f0c020 !important; color: #1a1200 !important; font-weight: 700; font-size: 15px; }
   .row-tashkent td { background: #d4a800 !important; color: #1a1200 !important; font-weight: 700; }
   .row-total-green td:last-child { background: #2a6a30 !important; color: #a0ffb0 !important; }
   .row-tashkent-red td:last-child { background: #6a1515 !important; color: #ff9090 !important; }
-
-  /* METRICS */
   .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 28px; }
   .metric { background: #161b27; border: 1px solid #2a2f45; border-radius: 10px; padding: 16px 18px; }
   .metric-label { font-size: 11px; color: #667799; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
@@ -53,22 +48,19 @@
   .metric-sub { font-size: 12px; color: #667799; margin-top: 4px; }
   .trend-up { color: #4caf80; }
   .trend-down { color: #ff6b6b; }
-
-  /* CARDS */
   .card { background: #161b27; border: 1px solid #2a2f45; border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
   .card-header { padding: 14px 18px; border-bottom: 1px solid #2a2f45; }
   .card-title { font-size: 14px; font-weight: 600; color: #ccd; }
   .card-body { overflow-x: auto; }
   .sep-row td { height: 6px; background: #0f1117 !important; padding: 0; }
-
-  /* NAV */
   .nav-arrows { position: fixed; bottom: 30px; left: 30px; display: flex; gap: 10px; z-index: 1000; }
   .nav-btn { width: 56px; height: 56px; border-radius: 50%; border: 2px solid #2a2f45; background: #161b27; color: #7eb3ff; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
   .nav-btn:hover { background: #1e2a45; border-color: #4f8ef7; color: #fff; transform: scale(1.1); }
   .nav-btn:active { transform: scale(0.95); }
-  /* THEME TOGGLE */
   .theme-btn { font-size: 11px; padding: 4px 12px; border-radius: 20px; background: #1e2535; color: #7eb3ff; border: 1px solid #2a2f45; cursor: pointer; transition: all 0.2s; }
   .theme-btn:hover { background: #2a3550; }
+  .admin-link { font-size: 11px; padding: 4px 12px; border-radius: 20px; background: #2a1535; color: #c07bff; border: 1px solid #4a2565; cursor: pointer; text-decoration: none; }
+  .admin-link:hover { background: #3a2045; }
 
   /* LIGHT MODE */
   body.light { background: #f0f2f5; color: #1a1a2e; }
@@ -76,16 +68,18 @@
   body.light .header h1 { color: #fff !important; }
   body.light .header h1 span { color: #fff !important; }
   body.light .header .save-status, body.light .header .badge, body.light .header .theme-btn { color: #fff; }
+  body.light .month-select { background: #333; color: #f0c020; border-color: #555; }
+  body.light .month-select option { background: #333; color: #fff; }
   body.light .badge { background: #333; color: #f0c020; border-color: #555; }
   body.light .save-status.saved { background: #2a3a20; color: #4caf80; border-color: #3a5a30; }
-  body.light .save-status.saving { background: #3a3520; color: #ffa040; border-color: #5a4a20; }
+  body.light .save-status.loading { background: #3a3520; color: #ffa040; border-color: #5a4a20; }
   body.light .theme-btn { background: #333; color: #f0c020; border-color: #555; }
   body.light .theme-btn:hover { background: #444; }
+  body.light .admin-link { background: #333; color: #f0c020; border-color: #555; }
   body.light .tabs { background: #1a1a1a; border-bottom-color: #333; }
   body.light .tab { color: #999; }
   body.light .tab:hover { color: #f0c020; background: #2a2a2a; }
   body.light .tab.active { color: #1a1a1a; background: #f0f2f5; border-color: #333; border-bottom-color: #f0f2f5; font-weight: 600; }
-  body.light .edit-hint { background: #e3edff; color: #2a5ab0; border-left-color: #4f8ef7; }
   body.light .card { background: #fff; border-color: #d8dce5; }
   body.light .card-header { background: #1a1a1a; border-bottom-color: #333; }
   body.light .card-title { color: #fff; }
@@ -119,9 +113,10 @@
 <div class="header">
   <h1>Inter <span>Nation</span> — Analytics Dashboard</h1>
   <div class="header-right">
-    <span class="save-status saved" id="save-status">✓ Saved</span>
+    <span class="save-status saved" id="status">✓ Loaded</span>
     <button class="theme-btn" id="theme-toggle" onclick="toggleTheme()">Light Mode</button>
-    <span class="badge">Mar 2025 vs Mar 2026</span>
+    <a href="admin.html" class="admin-link">Admin</a>
+    <select id="month-selector" class="month-select" onchange="loadMonth(this.value)"></select>
   </div>
 </div>
 
@@ -133,188 +128,42 @@
   <div class="tab" onclick="showPage('leads',this)">Leads</div>
 </div>
 
-<div class="content">
-
-  <div class="page active" id="page-overview">
-    <div class="metrics" id="metrics-grid"></div>
-    <div class="card">
-      <div class="card-header"><span class="card-title">Итого по регионам</span></div>
-      <div class="card-body"><table><thead><tr>
-        <th>Регион</th>
-        <th>Mar 2025</th>
-        <th>Mar 2026</th>
-        <th>Изм. (рел.)</th>
-        <th>Изм. (%)</th>
-      </tr></thead><tbody id="region-tbody"></tbody></table></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header"><span class="card-title">Топ роста / падения по филиалам</span></div>
-      <div class="card-body"><table><thead><tr>
-        <th>Филиал</th>
-        <th>Изменение</th>
-        <th>%</th>
-        <th>Статус</th>
-      </tr></thead><tbody id="overview-tbody"></tbody></table></div>
-    </div>
-  </div>
-
-  <div class="page" id="page-students">
-    <div class="card">
-      <div class="card-header"><span class="card-title">Студенты по филиалам — Mar 2025 vs Mar 2026</span></div>
-      <div class="card-body"><table><thead><tr>
-        <th>Филиал</th>
-        <th>Mar 2025</th>
-        <th>Mar 2026</th>
-        <th>Изм. (рел.)</th>
-        <th>Изм. (%)</th>
-      </tr></thead><tbody id="branch-tbody"></tbody></table></div>
-    </div>
-  </div>
-
-  <div class="page" id="page-registered">
-    <div class="card">
-      <div class="card-header"><span class="card-title">Распределение по уровням — Mar 2025 vs Mar 2026</span></div>
-      <div class="card-body"><table><thead><tr>
-        <th>Уровень</th>
-        <th>Mar 2025</th>
-        <th>Mar 2025 %</th>
-        <th>Mar 2026 %</th>
-        <th>Mar 2026</th>
-      </tr></thead><tbody id="levels-tbody"></tbody></table></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header"><span class="card-title">Распределение по возрасту — Mar 2025 vs Mar 2026</span></div>
-      <div class="card-body"><table><thead><tr>
-        <th>Возраст</th>
-        <th>Mar 2025</th>
-        <th>Mar 2025 %</th>
-        <th>Mar 2026 %</th>
-        <th>Mar 2026</th>
-      </tr></thead><tbody id="age-tbody"></tbody></table></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header"><span class="card-title">Новые студенты по филиалам — Mar 2026 vs Mar 2025</span></div>
-      <div class="card-body"><table><thead><tr>
-        <th>Филиал</th>
-        <th>Mar 2025</th>
-        <th>Mar 2026</th>
-        <th>Изм. (рел.)</th>
-        <th>Изм. (%)</th>
-      </tr></thead><tbody id="new-tbody"></tbody></table></div>
-    </div>
-  </div>
-
-  <div class="page" id="page-retention">
-    <div class="card">
-      <div class="card-header"><span class="card-title">Удержание: February → March (по уровням)</span></div>
-      <div class="card-body"><table><thead><tr>
-        <th>Уровень</th>
-        <th>2025 Feb</th>
-        <th>Ушли Mar 2025</th>
-        <th>Loss % 2025</th>
-        <th>2026 Feb</th>
-        <th>Ушли Mar 2026</th>
-        <th>Loss % 2026</th>
-        <th>Тренд</th>
-      </tr></thead><tbody id="retention-tbody"></tbody></table></div>
-    </div>
-  </div>
-
-  <div class="page" id="page-leads">
-    <div class="card">
-      <div class="card-header"><span class="card-title">Registered Leads by Level — Mar 2025 vs Mar 2026</span></div>
-      <div class="card-body"><table><thead><tr>
-        <th>Уровень</th>
-        <th>Mar 2025</th>
-        <th>Mar 2025 %</th>
-        <th>Mar 2026</th>
-        <th>Mar 2026 %</th>
-        <th>Изм. (рел.)</th>
-        <th>Изм. (%)</th>
-      </tr></thead><tbody id="leads-tbody"></tbody></table></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header"><span class="card-title">Registered Leads by Branch — Mar 2025 vs Mar 2026</span></div>
-      <div class="card-body"><table><thead><tr>
-        <th>Филиал</th>
-        <th>Mar 2025</th>
-        <th>Mar 2026</th>
-        <th>Изм. (рел.)</th>
-        <th>Изм. (%)</th>
-      </tr></thead><tbody id="leads-branch-tbody"></tbody></table></div>
-    </div>
-  </div>
-
-</div>
+<div class="content" id="dashboard-content"></div>
 
 <div class="nav-arrows">
-  <button class="nav-btn" onclick="navPage(-1)" title="Назад">◀</button>
-  <button class="nav-btn" onclick="navPage(1)" title="Вперёд">▶</button>
+  <button class="nav-btn" onclick="navPage(-1)" title="Назад">&#9664;</button>
+  <button class="nav-btn" onclick="navPage(1)" title="Вперёд">&#9654;</button>
 </div>
 
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 
 <script>
-// Firebase config
-const firebaseConfig = {
+firebase.initializeApp({
   apiKey: "AIzaSyBJ8ikYnEStYQ4c-HjtbmDVPVazLV1hgUg",
   authDomain: "inter-nation-staff-meeting.firebaseapp.com",
   databaseURL: "https://inter-nation-staff-meeting-default-rtdb.firebaseio.com",
   projectId: "inter-nation-staff-meeting",
   storageBucket: "inter-nation-staff-meeting.firebasestorage.app",
   messagingSenderId: "209791266565",
-  appId: "1:209791266565:web:5f77c238ce983e1186116c",
-  measurementId: "G-TVQ05FP0LF"
-};
+  appId: "1:209791266565:web:5f77c238ce983e1186116c"
+});
+const db = firebase.database();
 
-// THEME TOGGLE
+// Theme
 function toggleTheme() {
-  const body = document.body;
-  const btn = document.getElementById('theme-toggle');
-  body.classList.toggle('light');
-  const isLight = body.classList.contains('light');
-  btn.textContent = isLight ? 'Dark Mode' : 'Light Mode';
+  document.body.classList.toggle('light');
+  const isLight = document.body.classList.contains('light');
+  document.getElementById('theme-toggle').textContent = isLight ? 'Dark Mode' : 'Light Mode';
   localStorage.setItem('theme', isLight ? 'light' : 'dark');
 }
-// Restore saved theme
 if (localStorage.getItem('theme') === 'light') {
   document.body.classList.add('light');
-  document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('theme-toggle').textContent = 'Dark Mode';
-  });
+  document.addEventListener('DOMContentLoaded', () => { document.getElementById('theme-toggle').textContent = 'Dark Mode'; });
 }
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-const dataRef = db.ref('dashboard');
-
-let firebaseData = {};
-let saveTimer = null;
-let isLoaded = false;
-
-// Save one key to Firebase
-function save(key, v) {
-  firebaseData[key] = v;
-  dataRef.child(key).set(v);
-  const el = document.getElementById('save-status');
-  el.textContent = '⏳ Saving...'; el.className = 'save-status saving';
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => { el.textContent = '✓ Saved'; el.className = 'save-status saved'; }, 700);
-}
-
-// Get value: from Firebase data or default
-function val(key, def) {
-  return (firebaseData[key] !== undefined && firebaseData[key] !== null && firebaseData[key] !== 'null') ? firebaseData[key] : String(def);
-}
-
+// Navigation
 const pageIds = ['overview','students','retention','registered','leads'];
-
 function showPage(id, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -322,255 +171,194 @@ function showPage(id, el) {
   if (el) el.classList.add('active');
   else document.querySelectorAll('.tab')[pageIds.indexOf(id)].classList.add('active');
 }
-
 function navPage(dir) {
-  const current = pageIds.findIndex(id => document.getElementById('page-' + id).classList.contains('active'));
-  const next = (current + dir + pageIds.length) % pageIds.length;
-  showPage(pageIds[next], null);
+  const cur = pageIds.findIndex(id => document.getElementById('page-' + id).classList.contains('active'));
+  showPage(pageIds[(cur + dir + pageIds.length) % pageIds.length], null);
 }
 
-function resetAll() {
-  if (!confirm('Сбросить все изменения к исходным данным?')) return;
-  dataRef.remove().then(() => { location.reload(); });
+// Helpers
+function fmt(n) { return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+function pct(a, b) { return b !== 0 ? ((a / b) * 100).toFixed(2) : '0'; }
+function chgBadge(old, nw, isNew) {
+  if (isNew) return `<td>${nw}</td><td><span class="badge-new">NEW</span></td>`;
+  const d = nw - old, p = old > 0 ? ((d / old) * 100).toFixed(2) + '%' : '0%';
+  const cls = d >= 0 ? 'badge-pos' : 'badge-neg';
+  const tag = d < 0 ? `<span class="badge-neg">${p}</span>` : `<span class="badge-pos">${p}</span>`;
+  return `<td>${d}</td><td>${tag}</td>`;
+}
+function pctCell(val, total) { return total > 0 ? ((val / total) * 100).toFixed(1) + '%' : '0%'; }
+
+// Build dashboard from Firebase data
+function buildUI(d) {
+  const ms = d.monthShort || 'Mar', yo = d.yearOld || '2025', yn = d.yearNew || '2026';
+  const prev = d.prevMonthLabel || 'Feb';
+  const lOld = ms + ' ' + yo, lNew = ms + ' ' + yn;
+
+  // Compute branches
+  const br = Object.values(d.branches || {});
+  const totalOld = br.reduce((s, b) => s + (b.old || 0), 0);
+  const totalNew = br.reduce((s, b) => s + (b.new || 0), 0);
+  const tashOld = br.filter(b => b.region === 'tashkent').reduce((s, b) => s + (b.old || 0), 0);
+  const tashNew = br.filter(b => b.region === 'tashkent').reduce((s, b) => s + (b.new || 0), 0);
+  const newBranches = br.filter(b => b.isNew).map(b => b.name).join(', ');
+  const growthAbs = totalNew - totalOld;
+  const growthPct = totalOld > 0 ? ((growthAbs / totalOld) * 100).toFixed(2) : '0';
+  const tashChg = tashNew - tashOld;
+  const tashPct = tashOld > 0 ? ((tashChg / tashOld) * 100).toFixed(2) : '0';
+
+  // Regions
+  const regions = {};
+  br.forEach(b => {
+    const r = b.region || 'tashkent';
+    if (!regions[r]) regions[r] = { name: r === 'tashkent' ? 'Ташкент' : r === 'samarkand' ? 'Самарканд' : r === 'andijan' ? 'Андижан' : r === 'online' ? 'Онлайн' : r, old: 0, new: 0, isNew: false };
+    regions[r].old += b.old || 0;
+    regions[r].new += b.new || 0;
+    if (b.isNew && regions[r].old === 0) regions[r].isNew = true;
+  });
+
+  // Top growth/decline
+  const sorted = br.filter(b => !b.isNew).map(b => ({ ...b, chg: (b.new || 0) - (b.old || 0) })).sort((a, b) => b.chg - a.chg);
+  const topGrowth = sorted.filter(b => b.chg > 0).slice(0, 3);
+  const topDecline = sorted.filter(b => b.chg < 0).slice(0, 3);
+
+  // Levels & Age totals
+  const lv = Object.values(d.levels || {});
+  const lvTotalOld = lv.reduce((s, l) => s + (l.old || 0), 0);
+  const lvTotalNew = lv.reduce((s, l) => s + (l.new || 0), 0);
+  const ag = Object.values(d.ageGroups || {});
+  const agTotalOld = ag.reduce((s, a) => s + (a.old || 0), 0);
+  const agTotalNew = ag.reduce((s, a) => s + (a.new || 0), 0);
+
+  // New students
+  const ns = Object.values(d.newStudents || {});
+  const nsTotalOld = ns.reduce((s, n) => s + (n.old || 0), 0);
+  const nsTotalNew = ns.reduce((s, n) => s + (n.new || 0), 0);
+  const nsTashOld = ns.filter(n => !n.isNew && !['Samarkand','Andijan','Online'].includes(n.name)).reduce((s, n) => s + (n.old || 0), 0);
+  const nsTashNew = ns.filter(n => !['Samarkand','Andijan','Online'].includes(n.name) && !n.isNew).reduce((s, n) => s + (n.new || 0), 0);
+
+  // Leads
+  const ld = Object.values(d.leads || {});
+  const ldTotalOld = ld.reduce((s, l) => s + (l.old || 0), 0);
+  const ldTotalNew = ld.reduce((s, l) => s + (l.new || 0), 0);
+  const lb = Object.values(d.leadsBranch || {});
+  const lbTotalOld = lb.reduce((s, l) => s + (l.old || 0), 0);
+  const lbTotalNew = lb.reduce((s, l) => s + (l.new || 0), 0);
+
+  // Retention
+  const rt = Object.values(d.retention || {});
+
+  let h = '';
+
+  // === PAGE: OVERVIEW ===
+  h += `<div class="page active" id="page-overview">
+  <div class="metrics">
+    <div class="metric"><div class="metric-label">Total ${lOld}</div><div class="metric-value">${fmt(totalOld)}</div><div class="metric-sub">студентов</div></div>
+    <div class="metric"><div class="metric-label">Total ${lNew}</div><div class="metric-value">${fmt(totalNew)}</div><div class="metric-sub">студентов</div></div>
+    <div class="metric"><div class="metric-label">Рост (рел.)</div><div class="metric-value pos">+${fmt(growthAbs)}</div><div class="metric-sub">человек</div></div>
+    <div class="metric"><div class="metric-label">Рост %</div><div class="metric-value pos">+${growthPct}%</div><div class="metric-sub">год к году</div></div>
+    <div class="metric"><div class="metric-label">Ташкент ${yn}</div><div class="metric-value neg">${tashPct}%</div><div class="metric-sub">${tashChg >= 0 ? 'рост' : 'снижение'}</div></div>
+    <div class="metric"><div class="metric-label">Новых филиалов</div><div class="metric-value pos">${br.filter(b=>b.isNew).length}</div><div class="metric-sub">${newBranches}</div></div>
+  </div>
+  <div class="card"><div class="card-header"><span class="card-title">Итого по регионам</span></div><div class="card-body"><table><thead><tr><th>Регион</th><th>${lOld}</th><th>${lNew}</th><th>Изм. (рел.)</th><th>Изм. (%)</th></tr></thead><tbody>`;
+  Object.values(regions).forEach(r => { h += `<tr><td>${r.name}</td><td>${fmt(r.old)}</td><td>${fmt(r.new)}</td>${chgBadge(r.old, r.new, r.isNew)}</tr>`; });
+  h += `<tr class="row-total row-total-green"><td>TOTAL</td><td>${fmt(totalOld)}</td><td>${fmt(totalNew)}</td><td>${growthAbs}</td><td>${growthPct}%</td></tr></tbody></table></div></div>`;
+
+  h += `<div class="card"><div class="card-header"><span class="card-title">Топ роста / падения по филиалам</span></div><div class="card-body"><table><thead><tr><th>Филиал</th><th>Изменение</th><th>%</th><th>Статус</th></tr></thead><tbody>`;
+  topGrowth.forEach(b => { const p = pct(b.chg, b.old); h += `<tr><td>${b.name}</td><td>+${b.chg}</td><td><span class="badge-pos">+${p}%</span></td><td>${b.chg === Math.max(...topGrowth.map(x=>x.chg)) ? 'Лидер' : 'Хорошо'}</td></tr>`; });
+  h += `<tr class="sep-row"><td colspan="4"></td></tr>`;
+  topDecline.forEach(b => { const p = pct(b.chg, b.old); h += `<tr><td>${b.name}</td><td>${b.chg}</td><td><span class="badge-neg">${p}%</span></td><td>Проблема</td></tr>`; });
+  h += `</tbody></table></div></div></div>`;
+
+  // === PAGE: STUDENTS ===
+  h += `<div class="page" id="page-students"><div class="card"><div class="card-header"><span class="card-title">Студенты по филиалам — ${lOld} vs ${lNew}</span></div><div class="card-body"><table><thead><tr><th>Филиал</th><th>${lOld}</th><th>${lNew}</th><th>Изм. (рел.)</th><th>Изм. (%)</th></tr></thead><tbody>`;
+  br.forEach(b => { h += `<tr><td>${b.name}</td><td>${fmt(b.old)}</td><td>${fmt(b.new)}</td>${chgBadge(b.old, b.new, b.isNew)}</tr>`; });
+  h += `<tr class="row-tashkent row-tashkent-red"><td>TASHKENT</td><td>${fmt(tashOld)}</td><td>${fmt(tashNew)}</td><td>${tashChg}</td><td>${tashPct}%</td></tr>`;
+  h += `<tr class="row-total row-total-green"><td>TOTAL</td><td>${fmt(totalOld)}</td><td>${fmt(totalNew)}</td><td>${growthAbs}</td><td>${growthPct}%</td></tr>`;
+  h += `</tbody></table></div></div></div>`;
+
+  // === PAGE: RETENTION ===
+  h += `<div class="page" id="page-retention"><div class="card"><div class="card-header"><span class="card-title">Удержание: ${prev} → ${ms} (по уровням)</span></div><div class="card-body"><table><thead><tr><th>Уровень</th><th>${yo} ${prev}</th><th>Ушли ${lOld}</th><th>Loss % ${yo}</th><th>${yn} ${prev}</th><th>Ушли ${lNew}</th><th>Loss % ${yn}</th><th>Тренд</th></tr></thead><tbody>`;
+  rt.forEach(r => {
+    const lp25 = r.prevOld > 0 ? ((r.lostOld / r.prevOld) * 100).toFixed(1) : '0';
+    const lp26 = r.prevNew > 0 ? ((r.lostNew / r.prevNew) * 100).toFixed(1) : '0';
+    const trend = parseFloat(lp26) < parseFloat(lp25) ? 'Улучшение' : (parseFloat(lp26) > parseFloat(lp25) ? 'Хуже' : 'Без изменений');
+    const cls = trend === 'Улучшение' ? 'trend-up' : 'trend-down';
+    h += `<tr><td>${r.name}</td><td>${fmt(r.prevOld)}</td><td>${r.lostOld}</td><td>${lp25}%</td><td>${fmt(r.prevNew)}</td><td>${r.lostNew}</td><td>${lp26}%</td><td class="${cls}" style="font-weight:600">${trend}</td></tr>`;
+  });
+  h += `</tbody></table></div></div></div>`;
+
+  // === PAGE: REGISTERED (Waiting List) ===
+  h += `<div class="page" id="page-registered">`;
+  // Levels
+  h += `<div class="card"><div class="card-header"><span class="card-title">Распределение по уровням — ${lOld} vs ${lNew}</span></div><div class="card-body"><table><thead><tr><th>Уровень</th><th>${lOld}</th><th>${lOld} %</th><th>${lNew} %</th><th>${lNew}</th></tr></thead><tbody>`;
+  lv.forEach(l => { h += `<tr><td>${l.name}</td><td>${l.old}</td><td>${pctCell(l.old, lvTotalOld)}</td><td>${pctCell(l.new, lvTotalNew)}</td><td>${l.new}</td></tr>`; });
+  h += `<tr class="row-total"><td>TOTAL</td><td>${fmt(lvTotalOld)}</td><td></td><td></td><td>${fmt(lvTotalNew)}</td></tr></tbody></table></div></div>`;
+  // Age
+  h += `<div class="card"><div class="card-header"><span class="card-title">Распределение по возрасту — ${lOld} vs ${lNew}</span></div><div class="card-body"><table><thead><tr><th>Возраст</th><th>${lOld}</th><th>${lOld} %</th><th>${lNew} %</th><th>${lNew}</th></tr></thead><tbody>`;
+  ag.forEach(a => { h += `<tr><td>${a.name}</td><td>${a.old}</td><td>${pctCell(a.old, agTotalOld)}</td><td>${pctCell(a.new, agTotalNew)}</td><td>${a.new}</td></tr>`; });
+  h += `<tr class="row-total"><td>TOTAL</td><td>${fmt(agTotalOld)}</td><td></td><td></td><td>${fmt(agTotalNew)}</td></tr></tbody></table></div></div>`;
+  // New Students
+  h += `<div class="card"><div class="card-header"><span class="card-title">Новые студенты по филиалам — ${lNew} vs ${lOld}</span></div><div class="card-body"><table><thead><tr><th>Филиал</th><th>${lOld}</th><th>${lNew}</th><th>Изм. (рел.)</th><th>Изм. (%)</th></tr></thead><tbody>`;
+  ns.forEach(n => { h += `<tr><td>${n.name}</td><td>${n.old}</td><td>${n.new}</td>${chgBadge(n.old, n.new, n.isNew)}</tr>`; });
+  const nsTashChg = nsTashNew - nsTashOld, nsTashPct = nsTashOld > 0 ? ((nsTashChg / nsTashOld) * 100).toFixed(2) : '0';
+  const nsChg = nsTotalNew - nsTotalOld, nsPct = nsTotalOld > 0 ? ((nsChg / nsTotalOld) * 100).toFixed(2) : '0';
+  h += `<tr class="row-tashkent row-tashkent-red"><td>TASHKENT</td><td>${fmt(nsTashOld)}</td><td>${fmt(nsTashNew)}</td><td>${nsTashChg}</td><td>${nsTashPct}%</td></tr>`;
+  h += `<tr class="row-total row-total-green"><td>TOTAL</td><td>${fmt(nsTotalOld)}</td><td>${fmt(nsTotalNew)}</td><td>${nsChg}</td><td>${nsPct}%</td></tr>`;
+  h += `</tbody></table></div></div></div>`;
+
+  // === PAGE: LEADS ===
+  h += `<div class="page" id="page-leads">`;
+  // By Level
+  h += `<div class="card"><div class="card-header"><span class="card-title">Registered Leads by Level — ${lOld} vs ${lNew}</span></div><div class="card-body"><table><thead><tr><th>Уровень</th><th>${lOld}</th><th>${lOld} %</th><th>${lNew}</th><th>${lNew} %</th><th>Изм. (рел.)</th><th>Изм. (%)</th></tr></thead><tbody>`;
+  ld.forEach(l => {
+    const chg = (l.new || 0) - (l.old || 0), p = l.old > 0 ? ((chg / l.old) * 100).toFixed(1) + '%' : (l.new > 0 ? 'NEW' : '0%');
+    const tag = chg < 0 ? `<span class="badge-neg">${p}</span>` : `<span class="badge-pos">${p}</span>`;
+    h += `<tr><td>${l.name}</td><td>${l.old}</td><td>${pctCell(l.old, ldTotalOld)}</td><td>${l.new}</td><td>${pctCell(l.new, ldTotalNew)}</td><td>${chg}</td><td>${tag}</td></tr>`;
+  });
+  const ldChg = ldTotalNew - ldTotalOld, ldPctV = ldTotalOld > 0 ? ((ldChg / ldTotalOld) * 100).toFixed(2) : '0';
+  h += `<tr class="row-total row-total-green"><td>TOTAL</td><td>${fmt(ldTotalOld)}</td><td></td><td>${fmt(ldTotalNew)}</td><td></td><td>${ldChg}</td><td>${ldPctV}%</td></tr></tbody></table></div></div>`;
+  // By Branch
+  h += `<div class="card"><div class="card-header"><span class="card-title">Registered Leads by Branch — ${lOld} vs ${lNew}</span></div><div class="card-body"><table><thead><tr><th>Филиал</th><th>${lOld}</th><th>${lNew}</th><th>Изм. (рел.)</th><th>Изм. (%)</th></tr></thead><tbody>`;
+  lb.forEach(l => { h += `<tr><td>${l.name}</td><td>${l.old}</td><td>${l.new}</td>${chgBadge(l.old, l.new, l.isNew)}</tr>`; });
+  const lbChg = lbTotalNew - lbTotalOld, lbPctV = lbTotalOld > 0 ? ((lbChg / lbTotalOld) * 100).toFixed(2) : '0';
+  h += `<tr class="row-total row-total-green"><td>TOTAL</td><td>${fmt(lbTotalOld)}</td><td>${fmt(lbTotalNew)}</td><td>${lbChg}</td><td>${lbPctV}%</td></tr>`;
+  h += `</tbody></table></div></div></div>`;
+
+  document.getElementById('dashboard-content').innerHTML = h;
 }
 
-function e(key, def) {
-  return val(key, def);
+// Load month from Firebase
+function loadMonth(key) {
+  const st = document.getElementById('status');
+  st.textContent = '⏳ Loading...'; st.className = 'save-status loading';
+  db.ref('months/' + key).once('value').then(snap => {
+    const data = snap.val();
+    if (data) {
+      buildUI(data);
+      st.textContent = '✓ Loaded'; st.className = 'save-status saved';
+    } else {
+      st.textContent = '✗ No data'; st.className = 'save-status loading';
+    }
+  }).catch(() => {
+    st.textContent = '✗ Error'; st.className = 'save-status loading';
+  });
 }
 
-function initAll() {
-  // read-only mode — no editing
-}
-
-// Update elements when Firebase data changes (real-time sync)
-function applyFirebaseUpdate(key, value) {
-  firebaseData[key] = value;
-  const el = document.querySelector(`[data-key="${key}"]`);
-  if (el && !el.matches(':focus') && el.textContent !== value) {
-    el.textContent = value;
-  }
-}
-
-function buildUI() {
-  // METRICS
-  const metricsData = [
-    ['mv-lbl-1','Total Mar 2025','mv-val-1','18 708','mv-sub-1','студентов',''],
-    ['mv-lbl-2','Total Mar 2026','mv-val-2','21 546','mv-sub-2','студентов',''],
-    ['mv-lbl-3','Рост (рел.)','mv-val-3','+2 838','mv-sub-3','человек','pos'],
-    ['mv-lbl-4','Рост %','mv-val-4','+15,17%','mv-sub-4','год к году','pos'],
-    ['mv-lbl-5','Ташкент 2026','mv-val-5','-2,13%','mv-sub-5','снижение','neg'],
-    ['mv-lbl-6','Новых филиалов','mv-val-6','3','mv-sub-6','Andijan, Online, Yunusabad','pos'],
-  ];
-  const mg = document.getElementById('metrics-grid');
-  mg.innerHTML = '';
-  metricsData.forEach(([kl,lbl,kv,v,ks,sub,cls]) => {
-    mg.innerHTML += `<div class="metric">
-      <div class="metric-label" contenteditable="true" data-key="${kl}">${val(kl,lbl)}</div>
-      <div class="metric-value ${cls}" contenteditable="true" data-key="${kv}">${val(kv,v)}</div>
-      <div class="metric-sub" contenteditable="true" data-key="${ks}">${val(ks,sub)}</div>
-    </div>`;
+// Init: load config, populate month selector, load current month
+db.ref('config').once('value').then(snap => {
+  const cfg = snap.val();
+  if (!cfg) return;
+  const sel = document.getElementById('month-selector');
+  const months = cfg.availableMonths || {};
+  const sorted = Object.entries(months).sort((a, b) => (b[1].order || 0) - (a[1].order || 0));
+  sorted.forEach(([key, m]) => {
+    const opt = document.createElement('option');
+    opt.value = key; opt.textContent = m.label;
+    if (key === cfg.currentMonth) opt.selected = true;
+    sel.appendChild(opt);
   });
-
-  // REGION TABLE
-  const rgData = [
-    ['rg0','Ташкент',17495,17123,-372,'-2,13%','neg'],
-    ['rg1','Самарканд',1213,2063,850,'70,07%','pos'],
-    ['rg2','Андижан',0,1196,1196,'NEW','new'],
-    ['rg3','Онлайн',0,1164,1164,'NEW','new'],
-  ];
-  const rgTb = document.getElementById('region-tbody');
-  rgTb.innerHTML = '';
-  rgData.forEach(([p,n,v25,v26,chg,pct,type]) => {
-    let pc;
-    if (type === 'new') pc = `<td>${e(p+'d',chg)}</td><td><span class="badge-new">NEW</span></td>`;
-    else if (type === 'neg') pc = `<td>${e(p+'d',chg)}</td><td><span class="badge-neg">${e(p+'e',pct)}</span></td>`;
-    else pc = `<td>${e(p+'d',chg)}</td><td><span class="badge-pos">${e(p+'e',pct)}</span></td>`;
-    rgTb.innerHTML += `<tr><td>${e(p+'a',n)}</td><td>${e(p+'b',v25)}</td><td>${e(p+'c',v26)}</td>${pc}</tr>`;
-  });
-  rgTb.innerHTML += `<tr class="row-total row-total-green"><td>TOTAL</td><td>${e('rgtot1',18708)}</td><td>${e('rgtot2',21546)}</td><td>${e('rgtot3',2838)}</td><td>${e('rgtot4','15,17%')}</td></tr>`;
-
-  // OVERVIEW ROWS
-  const ovRows = [
-    ['ov-r1n','Samarkand','ov-r1c','+850','ov-r1p','+70,07%','pos','ov-r1s','Лидер'],
-    ['ov-r2n','Beruniy','ov-r2c','+285','ov-r2p','+22,28%','pos','ov-r2s','Хорошо'],
-    ['ov-r3n','Sergeli','ov-r3c','+242','ov-r3p','+23,56%','pos','ov-r3s','Хорошо'],
-    null,
-    ['ov-r4n','Xalqlar Dostligi','ov-r4c','-538','ov-r4p','-17,17%','neg','ov-r4s','Проблема'],
-    ['ov-r5n','Westminster','ov-r5c','-282','ov-r5p','-13,60%','neg','ov-r5s','Проблема'],
-    ['ov-r6n','Minor','ov-r6c','-281','ov-r6p','-23,75%','neg','ov-r6s','Проблема'],
-  ];
-  const ovTb = document.getElementById('overview-tbody');
-  ovTb.innerHTML = '';
-  ovRows.forEach(r => {
-    if (!r) { ovTb.innerHTML += `<tr class="sep-row"><td colspan="4"></td></tr>`; return; }
-    const [kn,n,kc,chg,kp,pct,type,ks,st] = r;
-    const pctEl = type === 'neg' ? `<span class="badge-neg">${e(kp,pct)}</span>` : `<span class="badge-pos">${e(kp,pct)}</span>`;
-    ovTb.innerHTML += `<tr><td>${e(kn,n)}</td><td>${e(kc,chg)}</td><td>${pctEl}</td><td>${e(ks,st)}</td></tr>`;
-  });
-
-  // BRANCH TABLE
-  const brData = [
-    ['br0','Samarkand',1213,2063,850,'70,07%','pos'],
-    ['br1','Andijan',0,1196,1196,'NEW','new'],
-    ['br2','Online',0,1164,1164,'NEW','new'],
-    ['br3','Sergeli',1027,1269,242,'23,56%','pos'],
-    ['br4','Beruniy',1279,1564,285,'22,28%','pos'],
-    ['br5','Minor',1183,902,-281,'-23,75%','neg'],
-    ['br6','Chilonzor',2046,2110,64,'3,13%','pos'],
-    ['br7','Maksim Gorkiy',2130,1956,-174,'-8,17%','neg'],
-    ['br8','Westminster',2074,1792,-282,'-13,60%','neg'],
-    ['br9','Ganga',838,804,-34,'-4,06%','neg'],
-    ['br10','Oybek',2767,2802,35,'1,27%','pos'],
-    ['br11','Xalqlar Dostligi',3133,2595,-538,'-17,17%','neg'],
-    ['br12','Yunusabad',0,483,483,'NEW','new'],
-    ['br13','C-1',1018,846,-172,'-16,90%','neg'],
-  ];
-  const bTb = document.getElementById('branch-tbody');
-  bTb.innerHTML = '';
-  brData.forEach(([p,n,v25,v26,chg,pct,type]) => {
-    let pc;
-    if (type === 'new') pc = `<td>${e(p+'d',chg)}</td><td><span class="badge-new">NEW</span></td>`;
-    else if (type === 'neg') pc = `<td>${e(p+'d',chg)}</td><td><span class="badge-neg">${e(p+'e',pct)}</span></td>`;
-    else pc = `<td>${e(p+'d',chg)}</td><td><span class="badge-pos">${e(p+'e',pct)}</span></td>`;
-    bTb.innerHTML += `<tr><td>${e(p+'a',n)}</td><td>${e(p+'b',v25)}</td><td>${e(p+'c',v26)}</td>${pc}</tr>`;
-  });
-  bTb.innerHTML += `<tr class="row-tashkent row-tashkent-red"><td>TASHKENT</td><td>${e('bt1',17495)}</td><td>${e('bt2',17123)}</td><td>${e('bt3',-372)}</td><td>${e('bt4','-2,13%')}</td></tr>`;
-  bTb.innerHTML += `<tr class="row-total row-total-green"><td>TOTAL</td><td>${e('btot1',18708)}</td><td>${e('btot2',21546)}</td><td>${e('btot3',2838)}</td><td>${e('btot4','15,17%')}</td></tr>`;
-
-  // LEVELS
-  const lvData = [
-    ['lv0','Beginner',486,'29.3%','54.5%',1379],
-    ['lv1','Elementary',220,'13.3%','15.3%',387],
-    ['lv2','Pre-Intermediate',231,'13.9%','10.9%',277],
-    ['lv3','Intermediate',227,'13.7%','9.2%',234],
-    ['lv4','Upper-Intermediate',226,'13.6%','3.6%',92],
-    ['lv5','IELTS',266,'16.1%','6.4%',162],
-  ];
-  const lvTb = document.getElementById('levels-tbody');
-  lvTb.innerHTML = '';
-  lvData.forEach(([p,n,v25,p25,p26,v26]) => {
-    lvTb.innerHTML += `<tr><td>${e(p+'a',n)}</td><td>${e(p+'b',v25)}</td><td>${e(p+'c',p25)}</td><td>${e(p+'d',p26)}</td><td>${e(p+'e',v26)}</td></tr>`;
-  });
-  lvTb.innerHTML += `<tr class="row-total"><td>TOTAL</td><td>${e('lvt1',1656)}</td><td></td><td></td><td>${e('lvt2',2531)}</td></tr>`;
-
-  // AGE
-  const agData = [
-    ['ag0','0-14',74,'4.5%','18.2%',460],
-    ['ag1','15-16',396,'23.9%','24.2%',613],
-    ['ag2','17-18',410,'24.8%','16.7%',422],
-    ['ag3','19-20',199,'12.0%','9.5%',240],
-    ['ag4','21-25',348,'21.0%','15.7%',398],
-    ['ag5','26-30',144,'8.7%','8.2%',208],
-    ['ag6','31-70',85,'5.1%','7.5%',190],
-  ];
-  const agTb = document.getElementById('age-tbody');
-  agTb.innerHTML = '';
-  agData.forEach(([p,n,v25,p25,p26,v26]) => {
-    agTb.innerHTML += `<tr><td>${e(p+'a',n)}</td><td>${e(p+'b',v25)}</td><td>${e(p+'c',p25)}</td><td>${e(p+'d',p26)}</td><td>${e(p+'e',v26)}</td></tr>`;
-  });
-  agTb.innerHTML += `<tr class="row-total"><td>TOTAL</td><td>${e('agt1',1656)}</td><td></td><td></td><td>${e('agt2',2531)}</td></tr>`;
-
-  // NEW STUDENTS
-  const nwData = [
-    ['nw0','Online',0,434,434,'NEW','new'],
-    ['nw1','Andijan',0,207,207,'NEW','new'],
-    ['nw2','Yunusabad',0,208,208,'NEW','new'],
-    ['nw3','Chilonzor',181,229,48,'26,5%','pos'],
-    ['nw4','Samarkand',248,229,-19,'-7,7%','neg'],
-    ['nw5','Beruniy',141,207,66,'46,8%','pos'],
-    ['nw6','Xalqlar Dostligi',179,206,27,'15,1%','pos'],
-    ['nw7','Oybek',214,203,-11,'-5,1%','neg'],
-    ['nw8','Maksim Gorkiy',225,177,-48,'-21,3%','neg'],
-    ['nw9','Sergeli',104,120,16,'15,4%','pos'],
-    ['nw10','Westminster',103,100,-3,'-2,9%','neg'],
-    ['nw11','Minor',117,99,-18,'-15,4%','neg'],
-    ['nw12','Ganga',62,59,-3,'-4,8%','neg'],
-    ['nw13','C1',82,53,-29,'-35,4%','neg'],
-  ];
-  const nwTb = document.getElementById('new-tbody');
-  nwTb.innerHTML = '';
-  nwData.forEach(([p,n,v25,v26,chg,pct,type]) => {
-    let pc;
-    if (type === 'new') pc = `<td>${e(p+'d',chg)}</td><td><span class="badge-new">NEW</span></td>`;
-    else if (type === 'neg') pc = `<td>${e(p+'d',chg)}</td><td><span class="badge-neg">${e(p+'e',pct)}</span></td>`;
-    else pc = `<td>${e(p+'d',chg)}</td><td><span class="badge-pos">${e(p+'e',pct)}</span></td>`;
-    nwTb.innerHTML += `<tr><td>${e(p+'a',n)}</td><td>${e(p+'b',v25)}</td><td>${e(p+'c',v26)}</td>${pc}</tr>`;
-  });
-  nwTb.innerHTML += `<tr class="row-tashkent row-tashkent-red"><td>TASHKENT</td><td>${e('nwt1',1408)}</td><td>${e('nwt2',1453)}</td><td>${e('nwt3',45)}</td><td>${e('nwt4','3,20%')}</td></tr>`;
-  nwTb.innerHTML += `<tr class="row-total row-total-green"><td>TOTAL</td><td>${e('nwtot1',1656)}</td><td>${e('nwtot2',2531)}</td><td>${e('nwtot3',875)}</td><td>${e('nwtot4','52,84%')}</td></tr>`;
-
-  // RETENTION — Feb → Mar
-  const rtData = [
-    ['rt0','Beginner',2932,323,'11.0%',3362,380,'11.3%','Чуть хуже'],
-    ['rt1','Elementary',4513,327,'7.2%',3947,358,'9.1%','Хуже'],
-    ['rt2','Pre-Intermediate',3896,315,'8.1%',4480,326,'7.3%','Улучшение'],
-    ['rt3','Intermediate',2863,276,'9.6%',3519,230,'6.5%','Улучшение'],
-    ['rt4','IELTS',2666,271,'10.2%',3539,264,'7.5%','Улучшение'],
-    ['rt5','Upper-Intermediate',2263,226,'10.0%',2715,226,'8.3%','Улучшение'],
-  ];
-  const rtTb = document.getElementById('retention-tbody');
-  rtTb.innerHTML = '';
-  rtData.forEach(([p,lvl,j25,l25,lp25,j26,l26,lp26,trend]) => {
-    const stored = val(p+'h', trend);
-    const cls = stored === 'Улучшение' ? 'trend-up' : 'trend-down';
-    rtTb.innerHTML += `<tr>
-      <td>${e(p+'a',lvl)}</td><td>${e(p+'b',j25)}</td><td>${e(p+'c',l25)}</td><td>${e(p+'d',lp25)}</td>
-      <td>${e(p+'e',j26)}</td><td>${e(p+'f',l26)}</td><td>${e(p+'g',lp26)}</td>
-      <td class="${cls}" style="font-weight:600">${e(p+'h',trend)}</td>
-    </tr>`;
-  });
-
-  // LEADS
-  const ldData = [
-    ['ld0','Beginner',208,'30.6%',601,'53.4%',393,'188,9%','pos'],
-    ['ld1','Elementary',90,'13.3%',182,'16.2%',92,'102,2%','pos'],
-    ['ld2','Pre-Intermediate',95,'14.0%',138,'12.3%',43,'45,3%','pos'],
-    ['ld3','Intermediate',93,'13.7%',94,'8.4%',1,'1,1%','pos'],
-    ['ld4','Upper-Intermediate',97,'14.3%',40,'3.6%',-57,'-58,8%','neg'],
-    ['ld5','IELTS',96,'14.1%',70,'6.2%',-26,'-27,1%','neg'],
-  ];
-  const ldTb = document.getElementById('leads-tbody');
-  ldTb.innerHTML = '';
-  ldData.forEach(([p,n,v25,p25,v26,p26,chg,pct,type]) => {
-    const pctEl = type === 'neg' ? `<span class="badge-neg">${e(p+'g',pct)}</span>` : `<span class="badge-pos">${e(p+'g',pct)}</span>`;
-    ldTb.innerHTML += `<tr><td>${e(p+'a',n)}</td><td>${e(p+'b',v25)}</td><td>${e(p+'c',p25)}</td><td>${e(p+'d',v26)}</td><td>${e(p+'e',p26)}</td><td>${e(p+'f',chg)}</td><td>${pctEl}</td></tr>`;
-  });
-  ldTb.innerHTML += `<tr class="row-total row-total-green"><td>TOTAL</td><td>${e('ldtot1',679)}</td><td></td><td>${e('ldtot2',1125)}</td><td></td><td>${e('ldtot3',446)}</td><td>${e('ldtot4','65,68%')}</td></tr>`;
-
-  // LEADS BY BRANCH
-  const lbData = [
-    ['lb0','Online',0,391,391,'NEW','new'],
-    ['lb1','Andijan',0,72,72,'NEW','new'],
-    ['lb2','Yunusabad',0,75,75,'NEW','new'],
-    ['lb3','Oybek',95,84,-11,'-11,6%','neg'],
-    ['lb4','Xalqlar Dostligi',86,91,5,'5,8%','pos'],
-    ['lb5','Maksim Gorkiy',95,65,-30,'-31,6%','neg'],
-    ['lb6','Samarkand',92,74,-18,'-19,6%','neg'],
-    ['lb7','Chilonzor',69,66,-3,'-4,3%','neg'],
-    ['lb8','Beruniy',54,64,10,'18,5%','pos'],
-    ['lb9','Sergeli',38,42,4,'10,5%','pos'],
-    ['lb10','Westminster',48,39,-9,'-18,8%','neg'],
-    ['lb11','Minor',47,32,-15,'-31,9%','neg'],
-    ['lb12','C1',25,17,-8,'-32,0%','neg'],
-    ['lb13','Ganga',30,13,-17,'-56,7%','neg'],
-  ];
-  const lbTb = document.getElementById('leads-branch-tbody');
-  lbTb.innerHTML = '';
-  lbData.forEach(([p,n,v25,v26,chg,pct,type]) => {
-    let pc;
-    if (type === 'new') pc = `<td>${e(p+'d',chg)}</td><td><span class="badge-new">NEW</span></td>`;
-    else if (type === 'neg') pc = `<td>${e(p+'d',chg)}</td><td><span class="badge-neg">${e(p+'e',pct)}</span></td>`;
-    else pc = `<td>${e(p+'d',chg)}</td><td><span class="badge-pos">${e(p+'e',pct)}</span></td>`;
-    lbTb.innerHTML += `<tr><td>${e(p+'a',n)}</td><td>${e(p+'b',v25)}</td><td>${e(p+'c',v26)}</td>${pc}</tr>`;
-  });
-  lbTb.innerHTML += `<tr class="row-total row-total-green"><td>TOTAL</td><td>${e('lbtot1',679)}</td><td>${e('lbtot2',1125)}</td><td>${e('lbtot3',446)}</td><td>${e('lbtot4','65,68%')}</td></tr>`;
-
-  initAll();
-}
-
-// Build UI immediately with defaults — no waiting for Firebase
-buildUI();
-isLoaded = true;
+  loadMonth(cfg.currentMonth || sorted[0]?.[0]);
+});
 </script>
 </body>
 </html>

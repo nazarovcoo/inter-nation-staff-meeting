@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inter Nation — Admin Panel</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f1117; color: #e8e8e8; min-height: 100vh; }
+  .header { background: #161b27; border-bottom: 1px solid #2a2f45; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .header h1 { font-size: 20px; font-weight: 600; color: #fff; }
+  .header h1 span { color: #4f8ef7; }
+  .header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .btn { font-size: 12px; padding: 6px 16px; border-radius: 20px; border: 1px solid #2a2f45; cursor: pointer; transition: all 0.2s; }
+  .btn-primary { background: #2a5ab0; color: #fff; border-color: #3a6ac0; }
+  .btn-primary:hover { background: #3a6ac0; }
+  .btn-success { background: #1a6a30; color: #fff; border-color: #2a8a40; }
+  .btn-success:hover { background: #2a8a40; }
+  .btn-link { background: transparent; color: #7eb3ff; border-color: #2a2f45; text-decoration: none; display: inline-block; }
+  .btn-link:hover { background: #1e2535; }
+  .btn-new { background: #6a2ab0; color: #fff; border-color: #7a3ac0; }
+  .btn-new:hover { background: #7a3ac0; }
+  .btn-current { background: #b06a20; color: #fff; border-color: #c07a30; }
+  .btn-current:hover { background: #c07a30; }
+  select.month-sel { background: #1e3a6e; color: #7eb3ff; font-size: 12px; padding: 6px 12px; border-radius: 20px; border: 1px solid #2d5aa0; cursor: pointer; outline: none; }
+  select.month-sel option { background: #161b27; color: #e8e8e8; }
+  .status { font-size: 11px; padding: 4px 12px; border-radius: 20px; }
+  .status-ok { background: #1a3520; color: #4caf80; border: 1px solid #2a5a40; }
+  .status-saving { background: #2a2510; color: #ffa040; border: 1px solid #5a4a20; }
+  .tabs { display: flex; gap: 4px; padding: 16px 32px 0; background: #161b27; border-bottom: 1px solid #2a2f45; overflow-x: auto; }
+  .tab { padding: 10px 20px; border-radius: 8px 8px 0 0; border: 1px solid transparent; font-size: 13px; cursor: pointer; color: #8899aa; white-space: nowrap; background: transparent; }
+  .tab:hover { color: #c0cfe0; background: #1e2535; }
+  .tab.active { color: #fff; background: #0f1117; border-color: #2a2f45; border-bottom-color: #0f1117; }
+  .content { padding: 28px 32px; max-width: 1100px; margin: 0 auto; }
+  .section { display: none; }
+  .section.active { display: block; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 20px; }
+  th { background: #1a2035; color: #8899cc; font-weight: 600; font-size: 12px; text-transform: uppercase; padding: 10px 12px; text-align: right; border-bottom: 2px solid #2a2f45; white-space: nowrap; }
+  th:first-child { text-align: left; }
+  td { padding: 8px 12px; border-bottom: 1px solid #1e2535; text-align: right; white-space: nowrap; }
+  td:first-child { text-align: left; color: #aab; font-weight: 500; }
+  input[type="number"] { width: 90px; background: #1a2035; border: 1px solid #2a2f45; color: #e8e8e8; padding: 6px 8px; border-radius: 6px; font-size: 13px; text-align: right; }
+  input[type="number"]:focus { outline: 2px solid #4f8ef7; border-color: #4f8ef7; }
+  input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+  select.region-sel { background: #1a2035; border: 1px solid #2a2f45; color: #e8e8e8; padding: 6px 8px; border-radius: 6px; font-size: 12px; }
+  .computed { color: #667799; font-size: 13px; }
+  .card { background: #161b27; border: 1px solid #2a2f45; border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
+  .card-header { padding: 14px 18px; border-bottom: 1px solid #2a2f45; }
+  .card-title { font-size: 14px; font-weight: 600; color: #ccd; }
+  .card-body { overflow-x: auto; padding: 0; }
+  .new-month-form { background: #161b27; border: 1px solid #2a2f45; border-radius: 12px; padding: 20px; margin-bottom: 20px; display: none; }
+  .new-month-form label { display: block; margin-bottom: 8px; color: #8899aa; font-size: 13px; }
+  .new-month-form select, .new-month-form input { background: #1a2035; border: 1px solid #2a2f45; color: #e8e8e8; padding: 8px 12px; border-radius: 6px; font-size: 14px; margin-right: 10px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Inter <span>Nation</span> — Admin Panel</h1>
+  <div class="header-right">
+    <span class="status status-ok" id="status">Ready</span>
+    <select class="month-sel" id="month-sel" onchange="loadMonth(this.value)"></select>
+    <button class="btn btn-new" onclick="toggleNewMonth()">+ New Month</button>
+    <button class="btn btn-success" onclick="saveAll()">Save</button>
+    <button class="btn btn-current" onclick="setAsCurrent()">Set as Current</button>
+    <a href="index.html" class="btn btn-link">Dashboard</a>
+  </div>
+</div>
+
+<div id="new-month-form" class="new-month-form">
+  <label>Create new month comparison:</label>
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <select id="nm-month">
+      <option value="Jan">January</option><option value="Feb">February</option><option value="Mar">March</option>
+      <option value="Apr">April</option><option value="May">May</option><option value="Jun">June</option>
+      <option value="Jul">July</option><option value="Aug">August</option><option value="Sep">September</option>
+      <option value="Oct">October</option><option value="Nov">November</option><option value="Dec">December</option>
+    </select>
+    <input type="number" id="nm-year-old" value="2025" style="width:80px" placeholder="Old year">
+    <span style="color:#667">vs</span>
+    <input type="number" id="nm-year-new" value="2026" style="width:80px" placeholder="New year">
+    <button class="btn btn-primary" onclick="createMonth()">Create</button>
+    <button class="btn btn-link" onclick="toggleNewMonth()">Cancel</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showSec('branches',this)">Branches</div>
+  <div class="tab" onclick="showSec('newstudents',this)">New Students</div>
+  <div class="tab" onclick="showSec('levels',this)">Levels</div>
+  <div class="tab" onclick="showSec('age',this)">Age</div>
+  <div class="tab" onclick="showSec('retention',this)">Retention</div>
+  <div class="tab" onclick="showSec('leads',this)">Leads</div>
+  <div class="tab" onclick="showSec('leadsbranch',this)">Leads by Branch</div>
+</div>
+
+<div class="content" id="admin-content">
+  <div class="section active" id="sec-branches"></div>
+  <div class="section" id="sec-newstudents"></div>
+  <div class="section" id="sec-levels"></div>
+  <div class="section" id="sec-age"></div>
+  <div class="section" id="sec-retention"></div>
+  <div class="section" id="sec-leads"></div>
+  <div class="section" id="sec-leadsbranch"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyBJ8ikYnEStYQ4c-HjtbmDVPVazLV1hgUg",
+  authDomain: "inter-nation-staff-meeting.firebaseapp.com",
+  databaseURL: "https://inter-nation-staff-meeting-default-rtdb.firebaseio.com",
+  projectId: "inter-nation-staff-meeting",
+  storageBucket: "inter-nation-staff-meeting.firebasestorage.app",
+  messagingSenderId: "209791266565",
+  appId: "1:209791266565:web:5f77c238ce983e1186116c"
+});
+const db = firebase.database();
+
+let currentMonthKey = '';
+let currentData = {};
+
+const BRANCHES = ['Samarkand','Andijan','Online','Sergeli','Beruniy','Minor','Chilonzor','Maksim Gorkiy','Westminster','Ganga','Oybek','Xalqlar Dostligi','Yunusabad','C-1'];
+const REGIONS = { 'Samarkand':'samarkand','Andijan':'andijan','Online':'online','Sergeli':'tashkent','Beruniy':'tashkent','Minor':'tashkent','Chilonzor':'tashkent','Maksim Gorkiy':'tashkent','Westminster':'tashkent','Ganga':'tashkent','Oybek':'tashkent','Xalqlar Dostligi':'tashkent','Yunusabad':'tashkent','C-1':'tashkent' };
+const LEVELS = ['Beginner','Elementary','Pre-Intermediate','Intermediate','Upper-Intermediate','IELTS'];
+const AGES = ['0-14','15-16','17-18','19-20','21-25','26-30','31-70'];
+
+function toKey(name) { return name.toLowerCase().replace(/[^a-z0-9]/g, ''); }
+
+function showSec(id, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  el.classList.add('active');
+}
+
+function toggleNewMonth() {
+  const f = document.getElementById('new-month-form');
+  f.style.display = f.style.display === 'block' ? 'none' : 'block';
+}
+
+function setStatus(text, ok) {
+  const s = document.getElementById('status');
+  s.textContent = text;
+  s.className = ok ? 'status status-ok' : 'status status-saving';
+}
+
+// Build forms
+function buildForms(d) {
+  currentData = d || {};
+  const ms = d.monthShort || 'Mar', yo = d.yearOld || '2025', yn = d.yearNew || '2026';
+
+  // BRANCHES
+  let h = `<div class="card"><div class="card-header"><span class="card-title">Students by Branch</span></div><div class="card-body"><table><thead><tr><th>Branch</th><th>Region</th><th>${ms} ${yo}</th><th>${ms} ${yn}</th><th>New?</th></tr></thead><tbody>`;
+  BRANCHES.forEach(name => {
+    const k = toKey(name), b = (d.branches || {})[k] || {};
+    const regions = ['tashkent','samarkand','andijan','online'];
+    const reg = b.region || REGIONS[name] || 'tashkent';
+    let regOpts = regions.map(r => `<option value="${r}" ${r === reg ? 'selected' : ''}>${r}</option>`).join('');
+    h += `<tr><td>${name}</td><td><select class="region-sel" data-branch="${k}" data-field="region">${regOpts}</select></td>
+    <td><input type="number" data-branch="${k}" data-field="old" value="${b.old || 0}"></td>
+    <td><input type="number" data-branch="${k}" data-field="new" value="${b.new || 0}"></td>
+    <td><input type="checkbox" data-branch="${k}" data-field="isNew" ${b.isNew ? 'checked' : ''}></td></tr>`;
+  });
+  h += `</tbody></table></div></div>`;
+  document.getElementById('sec-branches').innerHTML = h;
+
+  // NEW STUDENTS
+  h = `<div class="card"><div class="card-header"><span class="card-title">New Students by Branch</span></div><div class="card-body"><table><thead><tr><th>Branch</th><th>${ms} ${yo}</th><th>${ms} ${yn}</th><th>New?</th></tr></thead><tbody>`;
+  BRANCHES.forEach(name => {
+    const k = toKey(name), n = (d.newStudents || {})[k] || {};
+    h += `<tr><td>${name}</td>
+    <td><input type="number" data-ns="${k}" data-field="old" value="${n.old || 0}"></td>
+    <td><input type="number" data-ns="${k}" data-field="new" value="${n.new || 0}"></td>
+    <td><input type="checkbox" data-ns="${k}" data-field="isNew" ${n.isNew ? 'checked' : ''}></td></tr>`;
+  });
+  h += `</tbody></table></div></div>`;
+  document.getElementById('sec-newstudents').innerHTML = h;
+
+  // LEVELS
+  h = `<div class="card"><div class="card-header"><span class="card-title">Students by Level</span></div><div class="card-body"><table><thead><tr><th>Level</th><th>${ms} ${yo}</th><th>${ms} ${yn}</th></tr></thead><tbody>`;
+  LEVELS.forEach(name => {
+    const k = toKey(name), l = (d.levels || {})[k] || {};
+    h += `<tr><td>${name}</td>
+    <td><input type="number" data-level="${k}" data-field="old" value="${l.old || 0}"></td>
+    <td><input type="number" data-level="${k}" data-field="new" value="${l.new || 0}"></td></tr>`;
+  });
+  h += `</tbody></table></div></div>`;
+  document.getElementById('sec-levels').innerHTML = h;
+
+  // AGE
+  h = `<div class="card"><div class="card-header"><span class="card-title">Students by Age</span></div><div class="card-body"><table><thead><tr><th>Age</th><th>${ms} ${yo}</th><th>${ms} ${yn}</th></tr></thead><tbody>`;
+  AGES.forEach(name => {
+    const k = 'age_' + name.replace('-', '_'), a = (d.ageGroups || {})[k] || {};
+    h += `<tr><td>${name}</td>
+    <td><input type="number" data-age="${k}" data-field="old" value="${a.old || 0}"></td>
+    <td><input type="number" data-age="${k}" data-field="new" value="${a.new || 0}"></td></tr>`;
+  });
+  h += `</tbody></table></div></div>`;
+  document.getElementById('sec-age').innerHTML = h;
+
+  // RETENTION
+  const prev = d.prevMonthLabel || 'Feb';
+  h = `<div class="card"><div class="card-header"><span class="card-title">Retention: ${prev} → ${ms}</span></div><div class="card-body"><table><thead><tr><th>Level</th><th>${yo} ${prev} Students</th><th>Lost ${ms} ${yo}</th><th>${yn} ${prev} Students</th><th>Lost ${ms} ${yn}</th></tr></thead><tbody>`;
+  LEVELS.forEach(name => {
+    const k = toKey(name), r = (d.retention || {})[k] || {};
+    h += `<tr><td>${name}</td>
+    <td><input type="number" data-ret="${k}" data-field="prevOld" value="${r.prevOld || 0}"></td>
+    <td><input type="number" data-ret="${k}" data-field="lostOld" value="${r.lostOld || 0}"></td>
+    <td><input type="number" data-ret="${k}" data-field="prevNew" value="${r.prevNew || 0}"></td>
+    <td><input type="number" data-ret="${k}" data-field="lostNew" value="${r.lostNew || 0}"></td></tr>`;
+  });
+  h += `</tbody></table></div></div>`;
+  document.getElementById('sec-retention').innerHTML = h;
+
+  // LEADS BY LEVEL
+  h = `<div class="card"><div class="card-header"><span class="card-title">Leads by Level</span></div><div class="card-body"><table><thead><tr><th>Level</th><th>${ms} ${yo}</th><th>${ms} ${yn}</th></tr></thead><tbody>`;
+  LEVELS.forEach(name => {
+    const k = toKey(name), l = (d.leads || {})[k] || {};
+    h += `<tr><td>${name}</td>
+    <td><input type="number" data-lead="${k}" data-field="old" value="${l.old || 0}"></td>
+    <td><input type="number" data-lead="${k}" data-field="new" value="${l.new || 0}"></td></tr>`;
+  });
+  h += `</tbody></table></div></div>`;
+  document.getElementById('sec-leads').innerHTML = h;
+
+  // LEADS BY BRANCH
+  h = `<div class="card"><div class="card-header"><span class="card-title">Leads by Branch</span></div><div class="card-body"><table><thead><tr><th>Branch</th><th>${ms} ${yo}</th><th>${ms} ${yn}</th><th>New?</th></tr></thead><tbody>`;
+  BRANCHES.forEach(name => {
+    const k = toKey(name), l = (d.leadsBranch || {})[k] || {};
+    h += `<tr><td>${name}</td>
+    <td><input type="number" data-lb="${k}" data-field="old" value="${l.old || 0}"></td>
+    <td><input type="number" data-lb="${k}" data-field="new" value="${l.new || 0}"></td>
+    <td><input type="checkbox" data-lb="${k}" data-field="isNew" ${l.isNew ? 'checked' : ''}></td></tr>`;
+  });
+  h += `</tbody></table></div></div>`;
+  document.getElementById('sec-leadsbranch').innerHTML = h;
+}
+
+// Collect form data
+function collectData() {
+  const d = { ...currentData };
+
+  // Branches
+  d.branches = {};
+  BRANCHES.forEach(name => {
+    const k = toKey(name);
+    d.branches[k] = {
+      name: name,
+      region: document.querySelector(`[data-branch="${k}"][data-field="region"]`).value,
+      old: parseInt(document.querySelector(`[data-branch="${k}"][data-field="old"]`).value) || 0,
+      new: parseInt(document.querySelector(`[data-branch="${k}"][data-field="new"]`).value) || 0,
+      isNew: document.querySelector(`[data-branch="${k}"][data-field="isNew"]`).checked
+    };
+  });
+
+  // New Students
+  d.newStudents = {};
+  BRANCHES.forEach(name => {
+    const k = toKey(name);
+    const el = document.querySelector(`[data-ns="${k}"][data-field="old"]`);
+    if (!el) return;
+    d.newStudents[k] = {
+      name: name,
+      old: parseInt(document.querySelector(`[data-ns="${k}"][data-field="old"]`).value) || 0,
+      new: parseInt(document.querySelector(`[data-ns="${k}"][data-field="new"]`).value) || 0,
+      isNew: document.querySelector(`[data-ns="${k}"][data-field="isNew"]`).checked
+    };
+  });
+
+  // Levels
+  d.levels = {};
+  LEVELS.forEach(name => {
+    const k = toKey(name);
+    d.levels[k] = {
+      name: name,
+      old: parseInt(document.querySelector(`[data-level="${k}"][data-field="old"]`).value) || 0,
+      new: parseInt(document.querySelector(`[data-level="${k}"][data-field="new"]`).value) || 0
+    };
+  });
+
+  // Age
+  d.ageGroups = {};
+  AGES.forEach(name => {
+    const k = 'age_' + name.replace('-', '_');
+    d.ageGroups[k] = {
+      name: name,
+      old: parseInt(document.querySelector(`[data-age="${k}"][data-field="old"]`).value) || 0,
+      new: parseInt(document.querySelector(`[data-age="${k}"][data-field="new"]`).value) || 0
+    };
+  });
+
+  // Retention
+  d.retention = {};
+  LEVELS.forEach(name => {
+    const k = toKey(name);
+    d.retention[k] = {
+      name: name,
+      prevOld: parseInt(document.querySelector(`[data-ret="${k}"][data-field="prevOld"]`).value) || 0,
+      lostOld: parseInt(document.querySelector(`[data-ret="${k}"][data-field="lostOld"]`).value) || 0,
+      prevNew: parseInt(document.querySelector(`[data-ret="${k}"][data-field="prevNew"]`).value) || 0,
+      lostNew: parseInt(document.querySelector(`[data-ret="${k}"][data-field="lostNew"]`).value) || 0
+    };
+  });
+
+  // Leads
+  d.leads = {};
+  LEVELS.forEach(name => {
+    const k = toKey(name);
+    d.leads[k] = {
+      name: name,
+      old: parseInt(document.querySelector(`[data-lead="${k}"][data-field="old"]`).value) || 0,
+      new: parseInt(document.querySelector(`[data-lead="${k}"][data-field="new"]`).value) || 0
+    };
+  });
+
+  // Leads by Branch
+  d.leadsBranch = {};
+  BRANCHES.forEach(name => {
+    const k = toKey(name);
+    const el = document.querySelector(`[data-lb="${k}"][data-field="old"]`);
+    if (!el) return;
+    d.leadsBranch[k] = {
+      name: name,
+      old: parseInt(el.value) || 0,
+      new: parseInt(document.querySelector(`[data-lb="${k}"][data-field="new"]`).value) || 0,
+      isNew: document.querySelector(`[data-lb="${k}"][data-field="isNew"]`).checked
+    };
+  });
+
+  return d;
+}
+
+function saveAll() {
+  if (!currentMonthKey) return alert('No month selected');
+  setStatus('Saving...', false);
+  const data = collectData();
+  db.ref('months/' + currentMonthKey).set(data).then(() => {
+    setStatus('Saved!', true);
+  }).catch(err => {
+    setStatus('Error: ' + err.message, false);
+  });
+}
+
+function setAsCurrent() {
+  if (!currentMonthKey) return;
+  db.ref('config/currentMonth').set(currentMonthKey).then(() => {
+    setStatus('Set as current!', true);
+  });
+}
+
+function loadMonth(key) {
+  currentMonthKey = key;
+  setStatus('Loading...', false);
+  db.ref('months/' + key).once('value').then(snap => {
+    const data = snap.val() || {};
+    buildForms(data);
+    setStatus('Loaded', true);
+  });
+}
+
+function createMonth() {
+  const month = document.getElementById('nm-month').value;
+  const yearOld = document.getElementById('nm-year-old').value;
+  const yearNew = document.getElementById('nm-year-new').value;
+  const key = month.toLowerCase() + '-' + yearOld + '-vs-' + month.toLowerCase() + '-' + yearNew;
+  const label = month + ' ' + yearOld + ' vs ' + month + ' ' + yearNew;
+  const orderMap = { Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12 };
+  const order = parseInt(yearNew) * 100 + (orderMap[month] || 1);
+
+  // Determine previous month label
+  const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const idx = monthNames.indexOf(month);
+  const prevMonth = idx > 0 ? monthNames[idx - 1] : 'Dec';
+
+  const newData = {
+    monthShort: month,
+    yearOld: yearOld,
+    yearNew: yearNew,
+    label: label,
+    prevMonthLabel: prevMonth,
+    branches: {}, newStudents: {}, levels: {}, ageGroups: {}, retention: {}, leads: {}, leadsBranch: {}
+  };
+
+  // Pre-fill structure with zeros
+  BRANCHES.forEach(name => {
+    const k = toKey(name);
+    newData.branches[k] = { name, region: REGIONS[name] || 'tashkent', old: 0, new: 0, isNew: false };
+    newData.newStudents[k] = { name, old: 0, new: 0, isNew: false };
+    newData.leadsBranch[k] = { name, old: 0, new: 0, isNew: false };
+  });
+  LEVELS.forEach(name => {
+    const k = toKey(name);
+    newData.levels[k] = { name, old: 0, new: 0 };
+    newData.retention[k] = { name, prevOld: 0, lostOld: 0, prevNew: 0, lostNew: 0 };
+    newData.leads[k] = { name, old: 0, new: 0 };
+  });
+  AGES.forEach(name => {
+    const k = 'age_' + name.replace('-', '_');
+    newData.ageGroups[k] = { name, old: 0, new: 0 };
+  });
+
+  setStatus('Creating...', false);
+  Promise.all([
+    db.ref('months/' + key).set(newData),
+    db.ref('config/availableMonths/' + key).set({ label, order })
+  ]).then(() => {
+    // Add to dropdown
+    const sel = document.getElementById('month-sel');
+    const opt = document.createElement('option');
+    opt.value = key; opt.textContent = label; opt.selected = true;
+    sel.insertBefore(opt, sel.firstChild);
+    currentMonthKey = key;
+    buildForms(newData);
+    toggleNewMonth();
+    setStatus('Created!', true);
+  });
+}
+
+// Init
+db.ref('config').once('value').then(snap => {
+  const cfg = snap.val() || {};
+  const sel = document.getElementById('month-sel');
+  const months = cfg.availableMonths || {};
+  const sorted = Object.entries(months).sort((a, b) => (b[1].order || 0) - (a[1].order || 0));
+  sorted.forEach(([key, m]) => {
+    const opt = document.createElement('option');
+    opt.value = key; opt.textContent = m.label;
+    if (key === cfg.currentMonth) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  const startKey = cfg.currentMonth || (sorted[0] && sorted[0][0]);
+  if (startKey) loadMonth(startKey);
+  else buildForms({});
+});
+</script>
+</body>
+</html>

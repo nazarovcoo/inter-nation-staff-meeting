@@ -57,7 +57,11 @@
   .card-title { font-size: 14px; font-weight: 600; color: #ccd; }
   .card-body { overflow-x: auto; }
   .sep-row td { height: 6px; background: #0f1117 !important; padding: 0; }
-  @media(max-width:700px){ .content{padding:16px} .tabs{padding:12px 16px 0} .header{padding:14px 16px} }
+  .nav-arrows { position: fixed; bottom: 30px; left: 30px; display: flex; gap: 10px; z-index: 1000; }
+  .nav-btn { width: 56px; height: 56px; border-radius: 50%; border: 2px solid #2a2f45; background: #161b27; color: #7eb3ff; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+  .nav-btn:hover { background: #1e2a45; border-color: #4f8ef7; color: #fff; transform: scale(1.1); }
+  .nav-btn:active { transform: scale(0.95); }
+  @media(max-width:700px){ .content{padding:16px} .tabs{padding:12px 16px 0} .header{padding:14px 16px} .nav-arrows{bottom:16px;left:16px} .nav-btn{width:46px;height:46px;font-size:20px} }
 </style>
 </head>
 <body>
@@ -171,6 +175,11 @@
 
 </div>
 
+<div class="nav-arrows">
+  <button class="nav-btn" onclick="navPage(-1)" title="Назад">◀</button>
+  <button class="nav-btn" onclick="navPage(1)" title="Вперёд">▶</button>
+</div>
+
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
@@ -211,11 +220,20 @@ function val(key, def) {
   return (firebaseData[key] !== undefined && firebaseData[key] !== null && firebaseData[key] !== 'null') ? firebaseData[key] : String(def);
 }
 
+const pageIds = ['overview','students','levels','age','newstudents','retention'];
+
 function showPage(id, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
-  el.classList.add('active');
+  if (el) el.classList.add('active');
+  else document.querySelectorAll('.tab')[pageIds.indexOf(id)].classList.add('active');
+}
+
+function navPage(dir) {
+  const current = pageIds.findIndex(id => document.getElementById('page-' + id).classList.contains('active'));
+  const next = (current + dir + pageIds.length) % pageIds.length;
+  showPage(pageIds[next], null);
 }
 
 function resetAll() {

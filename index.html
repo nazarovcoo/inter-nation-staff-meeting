@@ -137,6 +137,7 @@
   <div class="tab" onclick="showPage('students',this)">Students by Branches</div>
   <div class="tab" onclick="showPage('registered',this)">Registered Students</div>
   <div class="tab" onclick="showPage('retention',this)">Lost List</div>
+  <div class="tab" onclick="showPage('leads',this)">Leads</div>
 </div>
 
 <div class="content">
@@ -233,6 +234,22 @@
     </div>
   </div>
 
+  <div class="page" id="page-leads">
+    <div class="edit-hint">✏️ <strong>Кликай на любую ячейку</strong> для редактирования. Всё сохраняется онлайн!</div>
+    <div class="card">
+      <div class="card-header"><span class="card-title" contenteditable="true" data-key="ld-card-title">Registered Leads by Level — Mar 2025 vs Mar 2026</span></div>
+      <div class="card-body"><table><thead><tr>
+        <th>Уровень</th>
+        <th>Mar 2025</th>
+        <th>Mar 2025 %</th>
+        <th>Mar 2026</th>
+        <th>Mar 2026 %</th>
+        <th>Изм. (рел.)</th>
+        <th>Изм. (%)</th>
+      </tr></thead><tbody id="leads-tbody"></tbody></table></div>
+    </div>
+  </div>
+
 </div>
 
 <div class="nav-arrows">
@@ -297,7 +314,7 @@ function val(key, def) {
   return (firebaseData[key] !== undefined && firebaseData[key] !== null && firebaseData[key] !== 'null') ? firebaseData[key] : String(def);
 }
 
-const pageIds = ['overview','students','registered','retention'];
+const pageIds = ['overview','students','registered','retention','leads'];
 
 function showPage(id, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -514,6 +531,23 @@ function buildUI() {
       <td class="${cls}" style="font-weight:600">${e(p+'h',trend)}</td>
     </tr>`;
   });
+
+  // LEADS
+  const ldData = [
+    ['ld0','Beginner',208,'30.6%',601,'53.4%',393,'188,9%','pos'],
+    ['ld1','Elementary',90,'13.3%',182,'16.2%',92,'102,2%','pos'],
+    ['ld2','Pre-Intermediate',95,'14.0%',138,'12.3%',43,'45,3%','pos'],
+    ['ld3','Intermediate',93,'13.7%',94,'8.4%',1,'1,1%','pos'],
+    ['ld4','Upper-Intermediate',97,'14.3%',40,'3.6%',-57,'-58,8%','neg'],
+    ['ld5','IELTS',96,'14.1%',70,'6.2%',-26,'-27,1%','neg'],
+  ];
+  const ldTb = document.getElementById('leads-tbody');
+  ldTb.innerHTML = '';
+  ldData.forEach(([p,n,v25,p25,v26,p26,chg,pct,type]) => {
+    const pctEl = type === 'neg' ? `<span class="badge-neg">${e(p+'g',pct)}</span>` : `<span class="badge-pos">${e(p+'g',pct)}</span>`;
+    ldTb.innerHTML += `<tr><td>${e(p+'a',n)}</td><td>${e(p+'b',v25)}</td><td>${e(p+'c',p25)}</td><td>${e(p+'d',v26)}</td><td>${e(p+'e',p26)}</td><td>${e(p+'f',chg)}</td><td>${pctEl}</td></tr>`;
+  });
+  ldTb.innerHTML += `<tr class="row-total row-total-green"><td>TOTAL</td><td>${e('ldtot1',679)}</td><td></td><td>${e('ldtot2',1125)}</td><td></td><td>${e('ldtot3',446)}</td><td>${e('ldtot4','65,68%')}</td></tr>`;
 
   initAll();
 }

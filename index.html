@@ -371,19 +371,19 @@ function buildUI() {
 
   // LEVELS
   const lvData = [
-    ['lv0','Beginner',759,'30.1%','54.3%',1586],
-    ['lv1','Elementary',397,'15.7%','14.8%',433],
-    ['lv2','Pre-Intermediate',385,'15.2%','11.0%',320],
-    ['lv3','Intermediate',298,'11.8%','10.2%',299],
-    ['lv4','Upper-Intermediate',349,'13.8%','4.4%',129],
-    ['lv5','IELTS',337,'13.3%','5.3%',154],
+    ['lv0','Beginner',486,'29.3%','54.5%',1379],
+    ['lv1','Elementary',220,'13.3%','15.3%',387],
+    ['lv2','Pre-Intermediate',231,'13.9%','10.9%',277],
+    ['lv3','Intermediate',227,'13.7%','9.2%',234],
+    ['lv4','Upper-Intermediate',226,'13.6%','3.6%',92],
+    ['lv5','IELTS',266,'16.1%','6.4%',162],
   ];
   const lvTb = document.getElementById('levels-tbody');
   lvTb.innerHTML = '';
   lvData.forEach(([p,n,v25,p25,p26,v26]) => {
     lvTb.innerHTML += `<tr><td>${e(p+'a',n)}</td><td>${e(p+'b',v25)}</td><td>${e(p+'c',p25)}</td><td>${e(p+'d',p26)}</td><td>${e(p+'e',v26)}</td></tr>`;
   });
-  lvTb.innerHTML += `<tr class="row-total"><td></td><td>${e('lvt1',2525)}</td><td></td><td></td><td>${e('lvt2',2921)}</td></tr>`;
+  lvTb.innerHTML += `<tr class="row-total"><td></td><td>${e('lvt1',1656)}</td><td></td><td></td><td>${e('lvt2',2531)}</td></tr>`;
 
   // AGE
   const agData = [

@@ -71,19 +71,16 @@
 <div class="header">
   <h1>Inter <span>Nation</span> — Analytics Dashboard</h1>
   <div class="header-right">
-    <span class="save-status saved" id="save-status">✓ Сохранено</span>
-    <button class="btn-reset" onclick="resetAll()">↺ Сбросить</button>
+    <span class="save-status saved" id="save-status">✓ Saved</span>
     <span class="badge">Mar 2025 vs Mar 2026</span>
   </div>
 </div>
 
 <div class="tabs">
-  <div class="tab active" onclick="showPage('overview',this)">Обзор</div>
-  <div class="tab" onclick="showPage('students',this)">Студенты по филиалам</div>
-  <div class="tab" onclick="showPage('levels',this)">Уровни</div>
-  <div class="tab" onclick="showPage('age',this)">Возраст</div>
-  <div class="tab" onclick="showPage('newstudents',this)">Новые студенты</div>
-  <div class="tab" onclick="showPage('retention',this)">Удержание</div>
+  <div class="tab active" onclick="showPage('overview',this)">Total Statistics</div>
+  <div class="tab" onclick="showPage('students',this)">Students by Branches</div>
+  <div class="tab" onclick="showPage('registered',this)">Registered Students</div>
+  <div class="tab" onclick="showPage('retention',this)">Lost List</div>
 </div>
 
 <div class="content">
@@ -127,7 +124,7 @@
     </div>
   </div>
 
-  <div class="page" id="page-levels">
+  <div class="page" id="page-registered">
     <div class="edit-hint">✏️ <strong>Кликай на любую ячейку</strong> для редактирования. Всё сохраняется онлайн!</div>
     <div class="card">
       <div class="card-header"><span class="card-title" contenteditable="true" data-key="lv-card-title">Распределение по уровням — Samarkand Mar 2026</span></div>
@@ -139,10 +136,7 @@
         <th contenteditable="true" data-key="lv-h5">Mar 2026</th>
       </tr></thead><tbody id="levels-tbody"></tbody></table></div>
     </div>
-  </div>
 
-  <div class="page" id="page-age">
-    <div class="edit-hint">✏️ <strong>Кликай на любую ячейку</strong> для редактирования. Всё сохраняется онлайн!</div>
     <div class="card">
       <div class="card-header"><span class="card-title" contenteditable="true" data-key="ag-card-title">Распределение по возрасту — Samarkand Mar 2026</span></div>
       <div class="card-body"><table><thead><tr>
@@ -153,10 +147,7 @@
         <th contenteditable="true" data-key="ag-h5">Mar 2026</th>
       </tr></thead><tbody id="age-tbody"></tbody></table></div>
     </div>
-  </div>
 
-  <div class="page" id="page-newstudents">
-    <div class="edit-hint">✏️ <strong>Кликай на любую ячейку</strong> для редактирования. Всё сохраняется онлайн!</div>
     <div class="card">
       <div class="card-header"><span class="card-title" contenteditable="true" data-key="nw-card-title">Новые студенты по филиалам — Mar 2026 vs Mar 2025</span></div>
       <div class="card-body"><table><thead><tr>
@@ -223,9 +214,9 @@ function save(key, v) {
   firebaseData[key] = v;
   dataRef.child(key).set(v);
   const el = document.getElementById('save-status');
-  el.textContent = '⏳ Сохраняю...'; el.className = 'save-status saving';
+  el.textContent = '⏳ Saving...'; el.className = 'save-status saving';
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => { el.textContent = '✓ Сохранено'; el.className = 'save-status saved'; }, 700);
+  saveTimer = setTimeout(() => { el.textContent = '✓ Saved'; el.className = 'save-status saved'; }, 700);
 }
 
 // Get value: from Firebase data or default
@@ -233,7 +224,7 @@ function val(key, def) {
   return (firebaseData[key] !== undefined && firebaseData[key] !== null && firebaseData[key] !== 'null') ? firebaseData[key] : String(def);
 }
 
-const pageIds = ['overview','students','levels','age','newstudents','retention'];
+const pageIds = ['overview','students','registered','retention'];
 
 function showPage(id, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));

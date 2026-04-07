@@ -208,7 +208,7 @@ function save(key, v) {
 
 // Get value: from Firebase data or default
 function val(key, def) {
-  return firebaseData[key] !== undefined ? firebaseData[key] : String(def);
+  return (firebaseData[key] !== undefined && firebaseData[key] !== null && firebaseData[key] !== 'null') ? firebaseData[key] : String(def);
 }
 
 function showPage(id, el) {

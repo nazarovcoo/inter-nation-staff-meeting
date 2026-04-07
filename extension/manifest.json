@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Inter Nation Data Sync",
+  "version": "1.0",
+  "description": "Fetch data from CRM and sync to Analytics Dashboard",
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": ["https://web-lms.inter-nation.uz/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon48.png"
+  },
+  "icons": {
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

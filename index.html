@@ -234,8 +234,10 @@ function attachEditable(el) {
 
 function initAll() {
   document.querySelectorAll('[contenteditable][data-key]').forEach(el => {
-    const stored = val(el.dataset.key, null);
-    if (stored !== null && el.textContent !== stored) el.textContent = stored;
+    const key = el.dataset.key;
+    if (firebaseData[key] !== undefined && firebaseData[key] !== null && firebaseData[key] !== 'null') {
+      if (el.textContent !== firebaseData[key]) el.textContent = firebaseData[key];
+    }
     attachEditable(el);
   });
 }

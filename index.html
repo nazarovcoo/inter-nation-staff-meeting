@@ -234,6 +234,17 @@
         <th>Изм. (%)</th>
       </tr></thead><tbody id="leads-tbody"></tbody></table></div>
     </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title">Registered Leads by Branch — Mar 2025 vs Mar 2026</span></div>
+      <div class="card-body"><table><thead><tr>
+        <th>Филиал</th>
+        <th>Mar 2025</th>
+        <th>Mar 2026</th>
+        <th>Изм. (рел.)</th>
+        <th>Изм. (%)</th>
+      </tr></thead><tbody id="leads-branch-tbody"></tbody></table></div>
+    </div>
   </div>
 
 </div>
@@ -523,6 +534,34 @@ function buildUI() {
     ldTb.innerHTML += `<tr><td>${e(p+'a',n)}</td><td>${e(p+'b',v25)}</td><td>${e(p+'c',p25)}</td><td>${e(p+'d',v26)}</td><td>${e(p+'e',p26)}</td><td>${e(p+'f',chg)}</td><td>${pctEl}</td></tr>`;
   });
   ldTb.innerHTML += `<tr class="row-total row-total-green"><td>TOTAL</td><td>${e('ldtot1',679)}</td><td></td><td>${e('ldtot2',1125)}</td><td></td><td>${e('ldtot3',446)}</td><td>${e('ldtot4','65,68%')}</td></tr>`;
+
+  // LEADS BY BRANCH
+  const lbData = [
+    ['lb0','Online',0,391,391,'NEW','new'],
+    ['lb1','Andijan',0,72,72,'NEW','new'],
+    ['lb2','Yunusabad',0,75,75,'NEW','new'],
+    ['lb3','Oybek',95,84,-11,'-11,6%','neg'],
+    ['lb4','Xalqlar Dostligi',86,91,5,'5,8%','pos'],
+    ['lb5','Maksim Gorkiy',95,65,-30,'-31,6%','neg'],
+    ['lb6','Samarkand',92,74,-18,'-19,6%','neg'],
+    ['lb7','Chilonzor',69,66,-3,'-4,3%','neg'],
+    ['lb8','Beruniy',54,64,10,'18,5%','pos'],
+    ['lb9','Sergeli',38,42,4,'10,5%','pos'],
+    ['lb10','Westminster',48,39,-9,'-18,8%','neg'],
+    ['lb11','Minor',47,32,-15,'-31,9%','neg'],
+    ['lb12','C1',25,17,-8,'-32,0%','neg'],
+    ['lb13','Ganga',30,13,-17,'-56,7%','neg'],
+  ];
+  const lbTb = document.getElementById('leads-branch-tbody');
+  lbTb.innerHTML = '';
+  lbData.forEach(([p,n,v25,v26,chg,pct,type]) => {
+    let pc;
+    if (type === 'new') pc = `<td>${e(p+'d',chg)}</td><td><span class="badge-new">NEW</span></td>`;
+    else if (type === 'neg') pc = `<td>${e(p+'d',chg)}</td><td><span class="badge-neg">${e(p+'e',pct)}</span></td>`;
+    else pc = `<td>${e(p+'d',chg)}</td><td><span class="badge-pos">${e(p+'e',pct)}</span></td>`;
+    lbTb.innerHTML += `<tr><td>${e(p+'a',n)}</td><td>${e(p+'b',v25)}</td><td>${e(p+'c',v26)}</td>${pc}</tr>`;
+  });
+  lbTb.innerHTML += `<tr class="row-total row-total-green"><td>TOTAL</td><td>${e('lbtot1',679)}</td><td>${e('lbtot2',1125)}</td><td>${e('lbtot3',446)}</td><td>${e('lbtot4','65,68%')}</td></tr>`;
 
   initAll();
 }

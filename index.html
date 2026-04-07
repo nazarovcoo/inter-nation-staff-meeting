@@ -73,6 +73,51 @@
   .nav-btn { width: 56px; height: 56px; border-radius: 50%; border: 2px solid #2a2f45; background: #161b27; color: #7eb3ff; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
   .nav-btn:hover { background: #1e2a45; border-color: #4f8ef7; color: #fff; transform: scale(1.1); }
   .nav-btn:active { transform: scale(0.95); }
+  /* THEME TOGGLE */
+  .theme-btn { font-size: 11px; padding: 4px 12px; border-radius: 20px; background: #1e2535; color: #7eb3ff; border: 1px solid #2a2f45; cursor: pointer; transition: all 0.2s; }
+  .theme-btn:hover { background: #2a3550; }
+
+  /* LIGHT MODE */
+  body.light { background: #f0f2f5; color: #1a1a2e; }
+  body.light .header { background: #fff; border-bottom-color: #d8dce5; }
+  body.light .header h1 { color: #1a1a2e; }
+  body.light .badge { background: #e3edff; color: #2a5ab0; border-color: #b0c8f0; }
+  body.light .save-status.saved { background: #e0f5e8; color: #1a7a40; border-color: #a0d8b0; }
+  body.light .save-status.saving { background: #fff3d0; color: #a07020; border-color: #e0c870; }
+  body.light .theme-btn { background: #e8ecf2; color: #3a5080; border-color: #c0c8d8; }
+  body.light .theme-btn:hover { background: #d0d8e5; }
+  body.light .tabs { background: #fff; border-bottom-color: #d8dce5; }
+  body.light .tab { color: #6a7590; }
+  body.light .tab:hover { color: #2a3550; background: #f0f2f8; }
+  body.light .tab.active { color: #1a1a2e; background: #f0f2f5; border-color: #d8dce5; border-bottom-color: #f0f2f5; }
+  body.light .edit-hint { background: #e3edff; color: #2a5ab0; border-left-color: #4f8ef7; }
+  body.light .card { background: #fff; border-color: #d8dce5; }
+  body.light .card-header { border-bottom-color: #d8dce5; }
+  body.light .card-title { color: #1a1a2e; }
+  body.light th { background: #f5f7fa; color: #4a5568; border-bottom-color: #d8dce5; }
+  body.light td { color: #1a1a2e; border-bottom-color: #e8ecf2; }
+  body.light tr:hover td { background: #f5f7fa; }
+  body.light [contenteditable]:focus { background: #e3edff !important; }
+  body.light [contenteditable]:hover:not(:focus) { background: #f0f2f8; }
+  body.light .badge-pos { color: #0a8a40; }
+  body.light .badge-neg { background: #ffe0e0; color: #cc2222; }
+  body.light .badge-new { background: #e0f5e8; color: #0a8a40; border-color: #a0d8b0; }
+  body.light .row-total td { background: #f0c020 !important; color: #1a1200 !important; }
+  body.light .row-tashkent td { background: #d4a800 !important; color: #1a1200 !important; }
+  body.light .row-total-green td:last-child { background: #2a8a40 !important; color: #fff !important; }
+  body.light .row-tashkent-red td:last-child { background: #cc2222 !important; color: #fff !important; }
+  body.light .metric { background: #fff; border-color: #d8dce5; }
+  body.light .metric-label { color: #6a7590; }
+  body.light .metric-value { color: #1a1a2e; }
+  body.light .metric-value.pos { color: #0a8a40; }
+  body.light .metric-value.neg { color: #cc2222; }
+  body.light .metric-sub { color: #6a7590; }
+  body.light .trend-up { color: #0a8a40; }
+  body.light .trend-down { color: #cc2222; }
+  body.light .sep-row td { background: #f0f2f5 !important; }
+  body.light .nav-btn { background: #fff; border-color: #d8dce5; color: #4f8ef7; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  body.light .nav-btn:hover { background: #e3edff; border-color: #4f8ef7; }
+
   @media(max-width:700px){ .content{padding:16px} .tabs{padding:12px 16px 0} .header{padding:14px 16px} .nav-arrows{bottom:16px;left:16px} .nav-btn{width:46px;height:46px;font-size:20px} }
 </style>
 </head>
@@ -82,6 +127,7 @@
   <h1>Inter <span>Nation</span> — Analytics Dashboard</h1>
   <div class="header-right">
     <span class="save-status saved" id="save-status">✓ Saved</span>
+    <button class="theme-btn" id="theme-toggle" onclick="toggleTheme()">Light Mode</button>
     <span class="badge">Mar 2025 vs Mar 2026</span>
   </div>
 </div>
@@ -210,6 +256,23 @@ const firebaseConfig = {
   appId: "1:209791266565:web:5f77c238ce983e1186116c",
   measurementId: "G-TVQ05FP0LF"
 };
+
+// THEME TOGGLE
+function toggleTheme() {
+  const body = document.body;
+  const btn = document.getElementById('theme-toggle');
+  body.classList.toggle('light');
+  const isLight = body.classList.contains('light');
+  btn.textContent = isLight ? 'Dark Mode' : 'Light Mode';
+  localStorage.setItem('theme', isLight ? 'light' : 'dark');
+}
+// Restore saved theme
+if (localStorage.getItem('theme') === 'light') {
+  document.body.classList.add('light');
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('theme-toggle').textContent = 'Dark Mode';
+  });
+}
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();

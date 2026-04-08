@@ -271,11 +271,7 @@ function buildUI(d) {
   Object.values(regions).forEach(r => { h += `<tr><td>${r.name}</td><td>${fmt(r.old)}</td><td>${fmt(r.new)}</td>${chgBadge(r.old, r.new, r.isNew)}</tr>`; });
   h += `<tr class="row-total row-total-green"><td>TOTAL</td><td>${fmt(totalOld)}</td><td>${fmt(totalNew)}</td><td>${growthAbs}</td><td>${growthPct}%</td></tr></tbody></table></div></div>`;
 
-  h += `<div class="card"><div class="card-header"><span class="card-title">Топ роста / падения по филиалам</span></div><div class="card-body"><table><thead><tr><th>Филиал</th><th>Изменение</th><th>%</th><th>Статус</th></tr></thead><tbody>`;
-  topGrowth.forEach(b => { const p = pct(b.chg, b.old); h += `<tr><td>${b.name}</td><td>+${b.chg}</td><td><span class="badge-pos">+${p}%</span></td><td>${b.chg === Math.max(...topGrowth.map(x=>x.chg)) ? 'Лидер' : 'Хорошо'}</td></tr>`; });
-  h += `<tr class="sep-row"><td colspan="4"></td></tr>`;
-  topDecline.forEach(b => { const p = pct(b.chg, b.old); h += `<tr><td>${b.name}</td><td>${b.chg}</td><td><span class="badge-neg">${p}%</span></td><td>Проблема</td></tr>`; });
-  h += `</tbody></table></div></div></div>`;
+  h += `</div>`;
 
   // === PAGE: STUDENTS ===
   h += `<div class="page" id="page-students"><div class="card"><div class="card-header"><span class="card-title">Студенты по филиалам — ${lOld} vs ${lNew}</span></div><div class="card-body"><table><thead><tr><th>Филиал</th><th>${lOld}</th><th>${lNew}</th><th>Изм. (рел.)</th><th>Изм. (%)</th></tr></thead><tbody>`;

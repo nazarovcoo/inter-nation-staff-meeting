@@ -291,7 +291,9 @@ function buildUI(d) {
     const lp26 = r.prevNew > 0 ? ((r.lostNew / r.prevNew) * 100).toFixed(1) : '0';
     const trend = parseFloat(lp26) < parseFloat(lp25) ? 'Улучшение' : (parseFloat(lp26) > parseFloat(lp25) ? 'Хуже' : 'Без изменений');
     const cls = trend === 'Улучшение' ? 'trend-up' : 'trend-down';
-    h += `<tr><td>${r.name}</td><td>${fmt(r.prevOld)}</td><td>${r.lostOld}</td><td>${lp25}%</td><td>${fmt(r.prevNew)}</td><td>${r.lostNew}</td><td>${lp26}%</td><td class="${cls}" style="font-weight:600">${trend}</td></tr>`;
+    const cls25 = parseFloat(lp25) <= parseFloat(lp26) ? 'badge-pos' : 'badge-neg';
+    const cls26 = parseFloat(lp26) < parseFloat(lp25) ? 'badge-pos' : 'badge-neg';
+    h += `<tr><td>${r.name}</td><td>${fmt(r.prevOld)}</td><td>${r.lostOld}</td><td><span class="${cls25}" style="padding:4px 8px;border-radius:6px">${lp25}%</span></td><td>${fmt(r.prevNew)}</td><td>${r.lostNew}</td><td><span class="${cls26}" style="padding:4px 8px;border-radius:6px">${lp26}%</span></td><td class="${cls}" style="font-weight:600">${trend}</td></tr>`;
   });
   h += `</tbody></table></div></div></div>`;
 

@@ -26,10 +26,10 @@
   .page { display: none; }
   .page.active { display: block; }
   table { width: 100%; border-collapse: collapse; font-size: 16px; }
-  th { background: #1a2035; color: #8899cc; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 24px; text-align: right; border-bottom: 2px solid #2a2f45; white-space: nowrap; }
-  th:first-child { text-align: left; padding-right: 40px; }
-  td { padding: 7px 24px; border-bottom: 1px solid #1e2535; color: #d0d8e8; vertical-align: middle; text-align: right; white-space: nowrap; }
-  td:first-child { text-align: left; padding-right: 40px; }
+  th { background: #1a2035; color: #8899cc; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 16px; text-align: right; border-bottom: 2px solid #2a2f45; white-space: nowrap; }
+  th:first-child { text-align: left; }
+  td { padding: 7px 16px; border-bottom: 1px solid #1e2535; color: #d0d8e8; vertical-align: middle; text-align: right; white-space: nowrap; }
+  td:first-child { text-align: left; }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: #161d2f; }
   .badge-new { background: #1a3520; color: #4caf80; font-size: 11px; padding: 3px 8px; border-radius: 12px; border: 1px solid #2a5a40; font-weight: 600; }
@@ -195,6 +195,7 @@ function chgBadge(old, nw, isNew) {
   return `<td>${d}</td><td>${tag}</td>`;
 }
 function pctCell(val, total) { return total > 0 ? ((val / total) * 100).toFixed(1) + '%' : '0%'; }
+function colGroup() { return '<colgroup><col style="width:22%"></colgroup>'; }
 
 // Build dashboard from Firebase data
 function buildUI(d) {
@@ -267,21 +268,21 @@ function buildUI(d) {
     <div class="metric"><div class="metric-label">Ташкент ${yn}</div><div class="metric-value neg">${tashPct}%</div><div class="metric-sub">${tashChg >= 0 ? 'рост' : 'снижение'}</div></div>
     <div class="metric"><div class="metric-label">Новых филиалов</div><div class="metric-value pos">${br.filter(b=>b.isNew).length}</div><div class="metric-sub">${newBranches}</div></div>
   </div>
-  <div class="card"><div class="card-header"><span class="card-title">Итого по регионам</span></div><div class="card-body"><table><thead><tr><th>Регион</th><th>${lOld}</th><th>${lNew}</th><th>Изм. (рел.)</th><th>Изм. (%)</th></tr></thead><tbody>`;
+  <div class="card"><div class="card-header"><span class="card-title">Итого по регионам</span></div><div class="card-body"><table>${colGroup()}<thead><tr><th>Регион</th><th>${lOld}</th><th>${lNew}</th><th>Изм. (рел.)</th><th>Изм. (%)</th></tr></thead><tbody>`;
   Object.values(regions).forEach(r => { h += `<tr><td>${r.name}</td><td>${fmt(r.old)}</td><td>${fmt(r.new)}</td>${chgBadge(r.old, r.new, r.isNew)}</tr>`; });
   h += `<tr class="row-total row-total-green"><td>TOTAL</td><td>${fmt(totalOld)}</td><td>${fmt(totalNew)}</td><td>${growthAbs}</td><td>${growthPct}%</td></tr></tbody></table></div></div>`;
 
   h += `</div>`;
 
   // === PAGE: STUDENTS ===
-  h += `<div class="page" id="page-students"><div class="card"><div class="card-header"><span class="card-title">Студенты по филиалам — ${lOld} vs ${lNew}</span></div><div class="card-body"><table><thead><tr><th>Филиал</th><th>${lOld}</th><th>${lNew}</th><th>Изм. (рел.)</th><th>Изм. (%)</th></tr></thead><tbody>`;
+  h += `<div class="page" id="page-students"><div class="card"><div class="card-header"><span class="card-title">Студенты по филиалам — ${lOld} vs ${lNew}</span></div><div class="card-body"><table>${colGroup()}<thead><tr><th>Филиал</th><th>${lOld}</th><th>${lNew}</th><th>Изм. (рел.)</th><th>Изм. (%)</th></tr></thead><tbody>`;
   br.forEach(b => { h += `<tr><td>${b.name}</td><td>${fmt(b.old)}</td><td>${fmt(b.new)}</td>${chgBadge(b.old, b.new, b.isNew)}</tr>`; });
   h += `<tr class="row-tashkent row-tashkent-red"><td>TASHKENT</td><td>${fmt(tashOld)}</td><td>${fmt(tashNew)}</td><td>${tashChg}</td><td>${tashPct}%</td></tr>`;
   h += `<tr class="row-total row-total-green"><td>TOTAL</td><td>${fmt(totalOld)}</td><td>${fmt(totalNew)}</td><td>${growthAbs}</td><td>${growthPct}%</td></tr>`;
   h += `</tbody></table></div></div></div>`;
 
   // === PAGE: RETENTION ===
-  h += `<div class="page" id="page-retention"><div class="card"><div class="card-header"><span class="card-title">Удержание: ${prev} → ${ms} (по уровням)</span></div><div class="card-body"><table><thead><tr><th>Уровень</th><th>${yo} ${prev}</th><th>Ушли ${lOld}</th><th>Loss % ${yo}</th><th>${yn} ${prev}</th><th>Ушли ${lNew}</th><th>Loss % ${yn}</th><th>Тренд</th></tr></thead><tbody>`;
+  h += `<div class="page" id="page-retention"><div class="card"><div class="card-header"><span class="card-title">Удержание: ${prev} → ${ms} (по уровням)</span></div><div class="card-body"><table>${colGroup()}<thead><tr><th>Уровень</th><th>${yo} ${prev}</th><th>Ушли ${lOld}</th><th>Loss % ${yo}</th><th>${yn} ${prev}</th><th>Ушли ${lNew}</th><th>Loss % ${yn}</th><th>Тренд</th></tr></thead><tbody>`;
   rt.forEach(r => {
     const lp25 = r.prevOld > 0 ? ((r.lostOld / r.prevOld) * 100).toFixed(1) : '0';
     const lp26 = r.prevNew > 0 ? ((r.lostNew / r.prevNew) * 100).toFixed(1) : '0';
@@ -296,7 +297,7 @@ function buildUI(d) {
   // === PAGE: REGISTERED (Waiting List) ===
   h += `<div class="page" id="page-registered">`;
   // Levels
-  h += `<div class="card"><div class="card-header"><span class="card-title">Распределение по уровням — ${lOld} vs ${lNew}</span></div><div class="card-body"><table><thead><tr><th>Уровень</th><th>${lOld}</th><th>${lOld} %</th><th>${lNew} %</th><th>${lNew}</th></tr></thead><tbody>`;
+  h += `<div class="card"><div class="card-header"><span class="card-title">Распределение по уровням — ${lOld} vs ${lNew}</span></div><div class="card-body"><table>${colGroup()}<thead><tr><th>Уровень</th><th>${lOld}</th><th>${lOld} %</th><th>${lNew} %</th><th>${lNew}</th></tr></thead><tbody>`;
   lv.forEach(l => {
     const pOld = lvTotalOld > 0 ? (l.old/lvTotalOld*100) : 0, pNew = lvTotalNew > 0 ? (l.new/lvTotalNew*100) : 0;
     const c25 = pOld <= pNew ? 'badge-pos' : 'badge-neg', c26 = pNew < pOld ? 'badge-pos' : 'badge-neg';
@@ -304,7 +305,7 @@ function buildUI(d) {
   });
   h += `<tr class="row-total"><td>TOTAL</td><td>${fmt(lvTotalOld)}</td><td></td><td></td><td>${fmt(lvTotalNew)}</td></tr></tbody></table></div></div>`;
   // Age
-  h += `<div class="card"><div class="card-header"><span class="card-title">Распределение по возрасту — ${lOld} vs ${lNew}</span></div><div class="card-body"><table><thead><tr><th>Возраст</th><th>${lOld}</th><th>${lOld} %</th><th>${lNew} %</th><th>${lNew}</th></tr></thead><tbody>`;
+  h += `<div class="card"><div class="card-header"><span class="card-title">Распределение по возрасту — ${lOld} vs ${lNew}</span></div><div class="card-body"><table>${colGroup()}<thead><tr><th>Возраст</th><th>${lOld}</th><th>${lOld} %</th><th>${lNew} %</th><th>${lNew}</th></tr></thead><tbody>`;
   ag.forEach(a => {
     const pOld = agTotalOld > 0 ? (a.old/agTotalOld*100) : 0, pNew = agTotalNew > 0 ? (a.new/agTotalNew*100) : 0;
     const c25 = pOld <= pNew ? 'badge-pos' : 'badge-neg', c26 = pNew < pOld ? 'badge-pos' : 'badge-neg';
@@ -312,7 +313,7 @@ function buildUI(d) {
   });
   h += `<tr class="row-total"><td>TOTAL</td><td>${fmt(agTotalOld)}</td><td></td><td></td><td>${fmt(agTotalNew)}</td></tr></tbody></table></div></div>`;
   // New Students
-  h += `<div class="card"><div class="card-header"><span class="card-title">Новые студенты по филиалам — ${lNew} vs ${lOld}</span></div><div class="card-body"><table><thead><tr><th>Филиал</th><th>${lOld}</th><th>${lNew}</th><th>Изм. (рел.)</th><th>Изм. (%)</th></tr></thead><tbody>`;
+  h += `<div class="card"><div class="card-header"><span class="card-title">Новые студенты по филиалам — ${lNew} vs ${lOld}</span></div><div class="card-body"><table>${colGroup()}<thead><tr><th>Филиал</th><th>${lOld}</th><th>${lNew}</th><th>Изм. (рел.)</th><th>Изм. (%)</th></tr></thead><tbody>`;
   ns.forEach(n => { h += `<tr><td>${n.name}</td><td>${n.old}</td><td>${n.new}</td>${chgBadge(n.old, n.new, n.isNew)}</tr>`; });
   const nsTashChg = nsTashNew - nsTashOld, nsTashPct = nsTashOld > 0 ? ((nsTashChg / nsTashOld) * 100).toFixed(2) : '0';
   const nsChg = nsTotalNew - nsTotalOld, nsPct = nsTotalOld > 0 ? ((nsChg / nsTotalOld) * 100).toFixed(2) : '0';
@@ -323,7 +324,7 @@ function buildUI(d) {
   // === PAGE: LEADS ===
   h += `<div class="page" id="page-leads">`;
   // By Level
-  h += `<div class="card"><div class="card-header"><span class="card-title">Registered Leads by Level — ${lOld} vs ${lNew}</span></div><div class="card-body"><table><thead><tr><th>Уровень</th><th>${lOld}</th><th>${lOld} %</th><th>${lNew}</th><th>${lNew} %</th><th>Изм. (рел.)</th><th>Изм. (%)</th></tr></thead><tbody>`;
+  h += `<div class="card"><div class="card-header"><span class="card-title">Registered Leads by Level — ${lOld} vs ${lNew}</span></div><div class="card-body"><table>${colGroup()}<thead><tr><th>Уровень</th><th>${lOld}</th><th>${lOld} %</th><th>${lNew}</th><th>${lNew} %</th><th>Изм. (рел.)</th><th>Изм. (%)</th></tr></thead><tbody>`;
   ld.forEach(l => {
     const chg = (l.new || 0) - (l.old || 0), p = l.old > 0 ? ((chg / l.old) * 100).toFixed(1) + '%' : (l.new > 0 ? 'NEW' : '0%');
     const tag = chg < 0 ? `<span class="badge-neg">${p}</span>` : `<span class="badge-pos">${p}</span>`;
@@ -334,7 +335,7 @@ function buildUI(d) {
   const ldChg = ldTotalNew - ldTotalOld, ldPctV = ldTotalOld > 0 ? ((ldChg / ldTotalOld) * 100).toFixed(2) : '0';
   h += `<tr class="row-total row-total-green"><td>TOTAL</td><td>${fmt(ldTotalOld)}</td><td></td><td>${fmt(ldTotalNew)}</td><td></td><td>${ldChg}</td><td>${ldPctV}%</td></tr></tbody></table></div></div>`;
   // By Branch
-  h += `<div class="card"><div class="card-header"><span class="card-title">Registered Leads by Branch — ${lOld} vs ${lNew}</span></div><div class="card-body"><table><thead><tr><th>Филиал</th><th>${lOld}</th><th>${lNew}</th><th>Изм. (рел.)</th><th>Изм. (%)</th></tr></thead><tbody>`;
+  h += `<div class="card"><div class="card-header"><span class="card-title">Registered Leads by Branch — ${lOld} vs ${lNew}</span></div><div class="card-body"><table>${colGroup()}<thead><tr><th>Филиал</th><th>${lOld}</th><th>${lNew}</th><th>Изм. (рел.)</th><th>Изм. (%)</th></tr></thead><tbody>`;
   lb.forEach(l => { h += `<tr><td>${l.name}</td><td>${l.old}</td><td>${l.new}</td>${chgBadge(l.old, l.new, l.isNew)}</tr>`; });
   const lbChg = lbTotalNew - lbTotalOld, lbPctV = lbTotalOld > 0 ? ((lbChg / lbTotalOld) * 100).toFixed(2) : '0';
   h += `<tr class="row-total row-total-green"><td>TOTAL</td><td>${fmt(lbTotalOld)}</td><td>${fmt(lbTotalNew)}</td><td>${lbChg}</td><td>${lbPctV}%</td></tr>`;

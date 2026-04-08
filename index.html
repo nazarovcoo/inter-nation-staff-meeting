@@ -299,7 +299,7 @@ function buildUI(d) {
   h += `<div class="card"><div class="card-header"><span class="card-title">Распределение по уровням — ${lOld} vs ${lNew}</span></div><div class="card-body"><table><thead><tr><th>Уровень</th><th>${lOld}</th><th>${lOld} %</th><th>${lNew} %</th><th>${lNew}</th></tr></thead><tbody>`;
   lv.forEach(l => {
     const pOld = lvTotalOld > 0 ? (l.old/lvTotalOld*100) : 0, pNew = lvTotalNew > 0 ? (l.new/lvTotalNew*100) : 0;
-    const c25 = pOld <= pNew ? 'badge-pos' : 'badge-neg', c26 = pNew >= pOld ? 'badge-pos' : 'badge-neg';
+    const c25 = pOld <= pNew ? 'badge-pos' : 'badge-neg', c26 = pNew < pOld ? 'badge-pos' : 'badge-neg';
     h += `<tr><td>${l.name}</td><td>${l.old}</td><td><span class="${c25}" style="padding:3px 8px;border-radius:6px">${pOld.toFixed(1)}%</span></td><td><span class="${c26}" style="padding:3px 8px;border-radius:6px">${pNew.toFixed(1)}%</span></td><td>${l.new}</td></tr>`;
   });
   h += `<tr class="row-total"><td>TOTAL</td><td>${fmt(lvTotalOld)}</td><td></td><td></td><td>${fmt(lvTotalNew)}</td></tr></tbody></table></div></div>`;
@@ -307,7 +307,7 @@ function buildUI(d) {
   h += `<div class="card"><div class="card-header"><span class="card-title">Распределение по возрасту — ${lOld} vs ${lNew}</span></div><div class="card-body"><table><thead><tr><th>Возраст</th><th>${lOld}</th><th>${lOld} %</th><th>${lNew} %</th><th>${lNew}</th></tr></thead><tbody>`;
   ag.forEach(a => {
     const pOld = agTotalOld > 0 ? (a.old/agTotalOld*100) : 0, pNew = agTotalNew > 0 ? (a.new/agTotalNew*100) : 0;
-    const c25 = pOld <= pNew ? 'badge-pos' : 'badge-neg', c26 = pNew >= pOld ? 'badge-pos' : 'badge-neg';
+    const c25 = pOld <= pNew ? 'badge-pos' : 'badge-neg', c26 = pNew < pOld ? 'badge-pos' : 'badge-neg';
     h += `<tr><td>${a.name}</td><td>${a.old}</td><td><span class="${c25}" style="padding:3px 8px;border-radius:6px">${pOld.toFixed(1)}%</span></td><td><span class="${c26}" style="padding:3px 8px;border-radius:6px">${pNew.toFixed(1)}%</span></td><td>${a.new}</td></tr>`;
   });
   h += `<tr class="row-total"><td>TOTAL</td><td>${fmt(agTotalOld)}</td><td></td><td></td><td>${fmt(agTotalNew)}</td></tr></tbody></table></div></div>`;
@@ -328,7 +328,7 @@ function buildUI(d) {
     const chg = (l.new || 0) - (l.old || 0), p = l.old > 0 ? ((chg / l.old) * 100).toFixed(1) + '%' : (l.new > 0 ? 'NEW' : '0%');
     const tag = chg < 0 ? `<span class="badge-neg">${p}</span>` : `<span class="badge-pos">${p}</span>`;
     const pO = ldTotalOld > 0 ? (l.old/ldTotalOld*100) : 0, pN = ldTotalNew > 0 ? (l.new/ldTotalNew*100) : 0;
-    const cO = pO <= pN ? 'badge-pos' : 'badge-neg', cN = pN >= pO ? 'badge-pos' : 'badge-neg';
+    const cO = pO <= pN ? 'badge-pos' : 'badge-neg', cN = pN < pO ? 'badge-pos' : 'badge-neg';
     h += `<tr><td>${l.name}</td><td>${l.old}</td><td><span class="${cO}" style="padding:3px 8px;border-radius:6px">${pO.toFixed(1)}%</span></td><td>${l.new}</td><td><span class="${cN}" style="padding:3px 8px;border-radius:6px">${pN.toFixed(1)}%</span></td><td>${chg}</td><td>${tag}</td></tr>`;
   });
   const ldChg = ldTotalNew - ldTotalOld, ldPctV = ldTotalOld > 0 ? ((ldChg / ldTotalOld) * 100).toFixed(2) : '0';

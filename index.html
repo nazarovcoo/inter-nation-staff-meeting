@@ -176,6 +176,14 @@ function navPage(dir) {
   showPage(pageIds[(cur + dir + pageIds.length) % pageIds.length], null);
 }
 
+// Fixed order for levels
+const LEVEL_ORDER = ['beginner','elementary','preintermediate','intermediate','upperintermediate','ielts'];
+function sortByLevelOrder(obj) {
+  const entries = Object.entries(obj || {});
+  return LEVEL_ORDER.map(k => entries.find(([key]) => key === k)).filter(Boolean).map(([,v]) => v)
+    .concat(entries.filter(([k]) => !LEVEL_ORDER.includes(k)).map(([,v]) => v));
+}
+
 // Helpers
 function fmt(n) { return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
 function pct(a, b) { return b !== 0 ? ((a / b) * 100).toFixed(2) : '0'; }
@@ -222,7 +230,7 @@ function buildUI(d) {
   const topDecline = sorted.filter(b => b.chg < 0).slice(0, 3);
 
   // Levels & Age totals
-  const lv = Object.values(d.levels || {});
+  const lv = sortByLevelOrder(d.levels);
   const lvTotalOld = lv.reduce((s, l) => s + (l.old || 0), 0);
   const lvTotalNew = lv.reduce((s, l) => s + (l.new || 0), 0);
   const ag = Object.values(d.ageGroups || {});
@@ -237,7 +245,7 @@ function buildUI(d) {
   const nsTashNew = ns.filter(n => !['Samarkand','Andijan','Online'].includes(n.name) && !n.isNew).reduce((s, n) => s + (n.new || 0), 0);
 
   // Leads
-  const ld = Object.values(d.leads || {});
+  const ld = sortByLevelOrder(d.leads);
   const ldTotalOld = ld.reduce((s, l) => s + (l.old || 0), 0);
   const ldTotalNew = ld.reduce((s, l) => s + (l.new || 0), 0);
   const lb = Object.values(d.leadsBranch || {});
@@ -245,7 +253,7 @@ function buildUI(d) {
   const lbTotalNew = lb.reduce((s, l) => s + (l.new || 0), 0);
 
   // Retention
-  const rt = Object.values(d.retention || {});
+  const rt = sortByLevelOrder(d.retention);
 
   let h = '';
 

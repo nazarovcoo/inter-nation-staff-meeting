@@ -297,11 +297,11 @@ function buildUI(d) {
   h += `<div class="page" id="page-registered">`;
   // Levels
   h += `<div class="card"><div class="card-header"><span class="card-title">Распределение по уровням — ${lOld} vs ${lNew}</span></div><div class="card-body"><table><thead><tr><th>Уровень</th><th>${lOld}</th><th>${lOld} %</th><th>${lNew} %</th><th>${lNew}</th></tr></thead><tbody>`;
-  lv.forEach(l => { h += `<tr><td>${l.name}</td><td>${l.old}</td><td>${pctCell(l.old, lvTotalOld)}</td><td>${pctCell(l.new, lvTotalNew)}</td><td>${l.new}</td></tr>`; });
+  lv.forEach(l => { h += `<tr><td>${l.name}</td><td>${l.old}</td><td style="color:#667799">${pctCell(l.old, lvTotalOld)}</td><td style="color:#667799">${pctCell(l.new, lvTotalNew)}</td><td>${l.new}</td></tr>`; });
   h += `<tr class="row-total"><td>TOTAL</td><td>${fmt(lvTotalOld)}</td><td></td><td></td><td>${fmt(lvTotalNew)}</td></tr></tbody></table></div></div>`;
   // Age
   h += `<div class="card"><div class="card-header"><span class="card-title">Распределение по возрасту — ${lOld} vs ${lNew}</span></div><div class="card-body"><table><thead><tr><th>Возраст</th><th>${lOld}</th><th>${lOld} %</th><th>${lNew} %</th><th>${lNew}</th></tr></thead><tbody>`;
-  ag.forEach(a => { h += `<tr><td>${a.name}</td><td>${a.old}</td><td>${pctCell(a.old, agTotalOld)}</td><td>${pctCell(a.new, agTotalNew)}</td><td>${a.new}</td></tr>`; });
+  ag.forEach(a => { h += `<tr><td>${a.name}</td><td>${a.old}</td><td style="color:#667799">${pctCell(a.old, agTotalOld)}</td><td style="color:#667799">${pctCell(a.new, agTotalNew)}</td><td>${a.new}</td></tr>`; });
   h += `<tr class="row-total"><td>TOTAL</td><td>${fmt(agTotalOld)}</td><td></td><td></td><td>${fmt(agTotalNew)}</td></tr></tbody></table></div></div>`;
   // New Students
   h += `<div class="card"><div class="card-header"><span class="card-title">Новые студенты по филиалам — ${lNew} vs ${lOld}</span></div><div class="card-body"><table><thead><tr><th>Филиал</th><th>${lOld}</th><th>${lNew}</th><th>Изм. (рел.)</th><th>Изм. (%)</th></tr></thead><tbody>`;
@@ -319,7 +319,7 @@ function buildUI(d) {
   ld.forEach(l => {
     const chg = (l.new || 0) - (l.old || 0), p = l.old > 0 ? ((chg / l.old) * 100).toFixed(1) + '%' : (l.new > 0 ? 'NEW' : '0%');
     const tag = chg < 0 ? `<span class="badge-neg">${p}</span>` : `<span class="badge-pos">${p}</span>`;
-    h += `<tr><td>${l.name}</td><td>${l.old}</td><td>${pctCell(l.old, ldTotalOld)}</td><td>${l.new}</td><td>${pctCell(l.new, ldTotalNew)}</td><td>${chg}</td><td>${tag}</td></tr>`;
+    h += `<tr><td>${l.name}</td><td>${l.old}</td><td style="color:#667799">${pctCell(l.old, ldTotalOld)}</td><td>${l.new}</td><td style="color:#667799">${pctCell(l.new, ldTotalNew)}</td><td>${chg}</td><td>${tag}</td></tr>`;
   });
   const ldChg = ldTotalNew - ldTotalOld, ldPctV = ldTotalOld > 0 ? ((ldChg / ldTotalOld) * 100).toFixed(2) : '0';
   h += `<tr class="row-total row-total-green"><td>TOTAL</td><td>${fmt(ldTotalOld)}</td><td></td><td>${fmt(ldTotalNew)}</td><td></td><td>${ldChg}</td><td>${ldPctV}%</td></tr></tbody></table></div></div>`;
